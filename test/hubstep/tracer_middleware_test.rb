@@ -11,7 +11,7 @@ module HubStep
     attr_reader :block
 
     def setup
-      @block = lambda { |env| [200, {}, "<html>"] }
+      @block = ->(_env) { [200, {}, "<html>"] }
       @original_enabled = HubStep.tracing_enabled?
       HubStep.tracing_enabled = true
     end

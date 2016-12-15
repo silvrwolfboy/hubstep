@@ -195,7 +195,7 @@ module HubStep
 
     def test_can_pass_custom_transport
       reports = []
-      callback = lambda { |report| reports << report }
+      callback = ->(report) { reports << report }
       transport = LightStep::Transport::Callback.new(callback: callback)
       tracer = HubStep::Tracer.new(transport: transport)
       tracer.enabled = true
@@ -206,7 +206,7 @@ module HubStep
 
     def test_sets_tags_on_tracer
       reports = []
-      callback = lambda { |report| reports << report }
+      callback = ->(report) { reports << report }
       transport = LightStep::Transport::Callback.new(callback: callback)
       tracer = HubStep::Tracer.new(transport: transport)
       tracer.enabled = true
