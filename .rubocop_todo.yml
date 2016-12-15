@@ -33,12 +33,6 @@ Style/ExtraSpacing:
 Style/HashSyntax:
   EnforcedStyle: hash_rockets
 
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/MutableConstant:
-  Exclude:
-    - 'lib/hubstep/version.rb'
-
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: PreferredDelimiters.
