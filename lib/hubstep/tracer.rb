@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "English"
 require "lightstep"
 require "singleton"
 
@@ -60,7 +61,7 @@ module HubStep
       begin
         yield span
       ensure
-        record_exception(span, $!) if $!
+        record_exception(span, $ERROR_INFO) if $ERROR_INFO
 
         remove(span)
 
