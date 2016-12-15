@@ -8,21 +8,7 @@ module HubStep
   # and configuring spans and support for enabling and disabling tracing at
   # runtime. A global instance is available via HubStep.tracer.
   class Tracer
-    def initialize(transport: nil, tags: {})
-      host = ENV["LIGHTSTEP_COLLECTOR_HOST"]
-      port = ENV["LIGHTSTEP_COLLECTOR_PORT"]
-      encryption = ENV["LIGHTSTEP_COLLECTOR_ENCRYPTION"]
-      access_token = ENV["LIGHTSTEP_ACCESS_TOKEN"]
-
-      transport ||= if host && port && encryption && access_token
-                      LightStep::Transport::HTTPJSON.new(host: host,
-                                                         port: port.to_i,
-                                                         encryption: encryption,
-                                                         access_token: access_token)
-                    else
-                      LightStep::Transport::Nil.new
-                    end
-
+    def initialize(transport: default_transport, tags: {})
       name = HubStep.server_metadata.values_at("app", "role").join("-")
 
       default_tags = {
@@ -95,6 +81,22 @@ module HubStep
     end
 
     private
+
+    def default_transport
+      host = ENV["LIGHTSTEP_COLLECTOR_HOST"]
+      port = ENV["LIGHTSTEP_COLLECTOR_PORT"]
+      encryption = ENV["LIGHTSTEP_COLLECTOR_ENCRYPTION"]
+      access_token = ENV["LIGHTSTEP_ACCESS_TOKEN"]
+
+      if host && port && encryption && access_token
+        LightStep::Transport::HTTPJSON.new(host: host,
+                                           port: port.to_i,
+                                           encryption: encryption,
+                                           access_token: access_token)
+      else
+        LightStep::Transport::Nil.new
+      end
+    end
 
     def remove(span)
       if span == @spans.last
