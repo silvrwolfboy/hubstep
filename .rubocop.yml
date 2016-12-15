@@ -8,6 +8,10 @@ Metrics/BlockLength:
   Exclude:
     - "hubstep.gemspec"
 
+Metrics/ClassLength:
+  Exclude:
+    - "test/**/*"
+
 Metrics/LineLength:
   Max: 100
 
