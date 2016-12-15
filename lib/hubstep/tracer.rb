@@ -110,7 +110,7 @@ module HubStep
 
     class InertSpan
       include Singleton
-      self.instance.freeze
+      instance.freeze
 
       def configure
       end
