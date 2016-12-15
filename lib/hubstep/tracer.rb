@@ -140,12 +140,14 @@ module HubStep
   end
 end
 
-class LightStep::Span
-  module Configurable
-    def configure
-      yield self
+module LightStep
+  class Span
+    module Configurable
+      def configure
+        yield self
+      end
     end
-  end
 
-  include Configurable
+    include Configurable
+  end
 end
