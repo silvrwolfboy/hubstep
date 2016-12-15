@@ -14,6 +14,9 @@ Metrics/LineLength:
 Style/DoubleNegation:
   Enabled: false
 
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
 
