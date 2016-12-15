@@ -29,11 +29,15 @@ module HubStep
 
       get "/foo"
 
+      expected = {
+        "http.method" => "GET",
+        "http.status_code" => "302",
+        "http.url" => "http://example.org/foo",
+        "span.kind" => "server",
+      }
+
       assert_equal "request", top_span.operation_name
-      assert_equal "GET", top_span.tags["http.method"]
-      assert_equal "302", top_span.tags["http.status_code"]
-      assert_equal "http://example.org/foo", top_span.tags["http.url"]
-      assert_equal "server", top_span.tags["span.kind"]
+      assert_equal expected, top_span.tags.select { |key, _value| expected.key?(key) }
       refute_includes top_span.tags, "guid:github_request_id"
     end
 
