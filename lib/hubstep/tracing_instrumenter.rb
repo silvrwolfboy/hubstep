@@ -10,10 +10,6 @@ module HubStep
       @tracer = tracer
     end
 
-    def service
-      ActiveSupport::Notifications
-    end
-
     def publish(name, *args)
       service.publish(name, *args)
     end
@@ -36,6 +32,12 @@ module HubStep
 
     def unsubscribe(args)
       service.unsubscribe(args)
+    end
+
+    private
+
+    def service
+      ActiveSupport::Notifications
     end
   end
 end
