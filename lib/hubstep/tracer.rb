@@ -15,7 +15,9 @@ module HubStep
         "hostname" => HubStep.hostname,
       }
 
-      @tracer = LightStep::Tracer.new(component_name: name, transport: transport, tags: default_tags.merge(tags))
+      @tracer = LightStep::Tracer.new(component_name: name,
+                                      transport: transport,
+                                      tags: default_tags.merge(tags))
       @spans = []
       self.enabled = false
     end
