@@ -44,7 +44,7 @@ module HubStep
         [302, {}, "<html>"]
       end
 
-      get "/foo", {}, { "HTTP_X_GITHUB_REQUEST_ID" => "1234abcd" }
+      get "/foo", {}, "HTTP_X_GITHUB_REQUEST_ID" => "1234abcd"
 
       assert_equal "1234abcd", top_span.tags["guid:github_request_id"]
     end
