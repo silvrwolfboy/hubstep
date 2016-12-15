@@ -5,12 +5,13 @@ require "rack"
 module HubStep
   # Rack middleware for wrapping a request in a span.
   class TracerMiddleware
-    def initialize(app)
+    def initialize(app, tracer)
       @app = app
+      @tracer = tracer
     end
 
     def call(env)
-      HubStep.tracer.with_enabled(HubStep.tracing_enabled?) do
+      @tracer.with_enabled(HubStep.tracing_enabled?) do
         trace(env) do
           @app.call(env)
         end
@@ -20,7 +21,7 @@ module HubStep
     private
 
     def trace(env)
-      HubStep.tracer.span("request") do |span|
+      @tracer.span("request") do |span|
         span.configure do
           add_tags(span, Rack::Request.new(env))
         end

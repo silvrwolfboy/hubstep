@@ -7,7 +7,7 @@ require "singleton"
 module HubStep
   # Tracer wraps LightStep::Tracer. It provides a block-based API for creating
   # and configuring spans and support for enabling and disabling tracing at
-  # runtime. A global instance is available via HubStep.tracer.
+  # runtime.
   class Tracer
     def initialize(transport: default_transport, tags: {})
       name = HubStep.server_metadata.values_at("app", "role").join("-")

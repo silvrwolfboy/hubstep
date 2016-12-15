@@ -5,13 +5,9 @@ require "hubstep/tracing_instrumenter"
 
 class TracingInstrumentorTest < Minitest::Test
   def setup
-    @original_enabled = HubStep.tracer.enabled?
-    @instrumenter = HubStep::TracingInstrumenter
-    HubStep.tracer.enabled = true
-  end
-
-  def teardown
-    HubStep.tracer.enabled = @original_enabled
+    @tracer = HubStep::Tracer.new
+    @tracer.enabled = true
+    @instrumenter = HubStep::TracingInstrumenter.new(@tracer)
   end
 
   def test_traces_instrumented_blocks
@@ -20,7 +16,7 @@ class TracingInstrumentorTest < Minitest::Test
     span = nil
     @instrumenter.instrument("foo", original_payload) do |payload|
       inner_payload = payload
-      span = HubStep.tracer.bottom_span
+      span = @tracer.bottom_span
     end
 
     assert_equal original_payload, inner_payload

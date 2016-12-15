@@ -19,11 +19,6 @@ module HubStep
     @hostname ||= Socket.gethostname.freeze
   end
 
-  # Returns a global Tracer instance.
-  def self.tracer
-    @tracer ||= Tracer.new
-  end
-
   # Internal: Reads server data written during provisioning.
   #
   # Returns a Hash.

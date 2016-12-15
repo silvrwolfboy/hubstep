@@ -20,10 +20,14 @@ module HubStep
       HubStep.tracing_enabled = @original_enabled
     end
 
+    def tracer
+      @tracer ||= Tracer.new
+    end
+
     def test_wraps_request_in_span
       top_span = nil
       @block = lambda do |_env|
-        top_span = HubStep.tracer.top_span
+        top_span = tracer.top_span
         [302, {}, "<html>"]
       end
 
@@ -44,7 +48,7 @@ module HubStep
     def test_records_request_id_if_present
       top_span = nil
       @block = lambda do |_env|
-        top_span = HubStep.tracer.top_span
+        top_span = tracer.top_span
         [302, {}, "<html>"]
       end
 
@@ -56,7 +60,7 @@ module HubStep
     def app
       test_instance = self
       @app ||= Rack::Builder.new do
-        use HubStep::TracerMiddleware
+        use HubStep::TracerMiddleware, test_instance.tracer
         run ->(env) { test_instance.block.call(env) }
       end
     end
