@@ -22,7 +22,7 @@ module HubStep
 
     def test_wraps_request_in_span
       top_span = nil
-      @block = lambda { |env|
+      @block = lambda { |_env|
         top_span = HubStep.tracer.top_span
         [302, {}, "<html>"]
       }
@@ -39,7 +39,7 @@ module HubStep
 
     def test_records_request_id_if_present
       top_span = nil
-      @block = lambda { |env|
+      @block = lambda { |_env|
         top_span = HubStep.tracer.top_span
         [302, {}, "<html>"]
       }
