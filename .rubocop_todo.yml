@@ -40,18 +40,6 @@ Style/SpaceAroundOperators:
   Exclude:
     - 'hubstep.gemspec'
 
-# Offense count: 26
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, ConsistentQuotesInMultiline.
-# SupportedStyles: single_quotes, double_quotes
-Style/StringLiterals:
-  Exclude:
-    - 'Rakefile'
-    - 'bin/console'
-    - 'hubstep.gemspec'
-    - 'lib/hubstep.rb'
-    - 'lib/hubstep/version.rb'
-
 # Offense count: 2
 # Cop supports --auto-correct.
 Style/UnneededPercentQ:
