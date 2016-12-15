@@ -1,0 +1,47 @@
+# frozen_string_literal: true
+
+require "English"
+require "failbot"
+
+# rubocop:disable Style/Documentation
+module LightStep
+  module Transport
+    class HTTPJSON
+      module Failbot
+        class HTTPError < StandardError; end
+
+        # There's no way to call through to the normal implementation while getting
+        # access to the response object, so we just copy all the code here.
+        def report(report) # rubocop:disable Metrics/AbcSize
+          p report if @verbose >= 3
+
+          https = Net::HTTP.new(@host, @port)
+          https.use_ssl = @encryption == ENCRYPTION_TLS
+          req = Net::HTTP::Post.new("/api/v0/reports")
+          req["LightStep-Access-Token"] = @access_token
+          req["Content-Type"] = "application/json"
+          req["Connection"] = "keep-alive"
+          req.body = report.to_json
+          res = https.request(req)
+
+          puts res.to_s, res.body if @verbose >= 3
+
+          track_error(res)
+
+          nil
+        ensure
+          ::Failbot.report!($ERROR_INFO) if $ERROR_INFO
+        end
+
+        def track_error(res)
+          return unless res.is_a?(Net::HTTPClientError) || res.is_a?(Net::HTTPServerError)
+          exception = HTTPError.new("#{res.code} #{res.message}")
+          exception.set_backtrace(caller)
+          ::Failbot.report!(exception, response_body: res.body, response_uri: res.uri)
+        end
+      end
+
+      prepend Failbot
+    end
+  end
+end
