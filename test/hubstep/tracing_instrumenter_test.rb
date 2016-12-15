@@ -15,7 +15,7 @@ class TracingInstrumentorTest < Minitest::Test
   end
 
   def test_traces_instrumented_blocks
-    original_payload = { :bar => :baz }
+    original_payload = { bar: :baz }
     inner_payload = nil
     span = nil
     @instrumenter.instrument("foo", original_payload) do |payload|
@@ -28,7 +28,7 @@ class TracingInstrumentorTest < Minitest::Test
   end
 
   def test_passes_span_to_blocks
-    original_payload = { :bar => :baz }
+    original_payload = { bar: :baz }
     inner_payload = nil
     inner_span = nil
     @instrumenter.instrument("foo", original_payload) do |payload, span|
@@ -45,7 +45,7 @@ class TracingInstrumentorTest < Minitest::Test
     callback = lambda do |*args|
       event = ActiveSupport::Notifications::Event.new(*args)
     end
-    payload = { :bar => :baz }
+    payload = { bar: :baz }
     ActiveSupport::Notifications.subscribed(callback, "foo") do
       @instrumenter.instrument("foo", payload)
     end
