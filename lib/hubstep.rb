@@ -1,5 +1,5 @@
 require "hubstep/version"
 
-module Hubstep
+module HubStep
   # Your code goes here...
 end

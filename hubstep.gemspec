@@ -5,7 +5,7 @@ require 'hubstep/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "hubstep"
-  spec.version       = Hubstep::VERSION
+  spec.version       = HubStep::VERSION
   spec.authors       = ["Adam Roben"]
   spec.email         = ["adam@roben.org"]
 
