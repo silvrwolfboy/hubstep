@@ -26,9 +26,7 @@ module HubStep
       !!@enabled
     end
 
-    def enabled=(value)
-      @enabled = value
-    end
+    attr_writer :enabled
 
     def with_enabled(value)
       original = enabled?
