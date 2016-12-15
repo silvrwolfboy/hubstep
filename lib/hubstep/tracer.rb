@@ -118,19 +118,19 @@ module HubStep
       def operation_name=(name)
       end
 
-      def set_tag(key, value)
+      def set_tag(_key, _value)
         self
       end
 
-      def set_baggage_item(key, value)
+      def set_baggage_item(_key, _value)
         self
       end
 
-      def get_baggage_item(key, value)
+      def get_baggage_item(_key, _value)
         nil
       end
 
-      def log(event: nil, timestamp: nil, **fields)
+      def log(event: nil, timestamp: nil, **fields) # rubocop:disable Lint/UnusedMethodArgument
         nil
       end
 
