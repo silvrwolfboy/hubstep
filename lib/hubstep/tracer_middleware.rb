@@ -45,7 +45,8 @@ module HubStep
         "http.url" => request.url,
         "http.method" => request.request_method,
       }
-      if id = request_id(request)
+      id = request_id(request)
+      if id
         tags["guid:github_request_id"] = id
       end
 
