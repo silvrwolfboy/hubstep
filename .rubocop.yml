@@ -4,6 +4,10 @@ AllCops:
     - "bin/**/*"
     - "vendor/**/*"
 
+Metrics/BlockLength:
+  Exclude:
+    - "hubstep.gemspec"
+
 Metrics/LineLength:
   Max: 100
 
