@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Adam Roben"]
   spec.email         = ["adam@roben.org"]
 
-  spec.summary       = %q{Standard LightStep tracing of GitHub Ruby apps}
-  spec.description   = %q{Makes it easy to trace Sinatra and Ruby apps that use GitHub conventions.}
+  spec.summary       = "Standard LightStep tracing of GitHub Ruby apps"
+  spec.description   = "Makes it easy to trace Sinatra and Ruby apps that use GitHub conventions."
   spec.homepage      = "https://github.com/github/hubstep"
   spec.license       = "MIT"
 
