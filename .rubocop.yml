@@ -17,3 +17,6 @@ Style/HashSyntax:
 Style/StringLiterals:
   EnforcedStyle: double_quotes
   ConsistentQuotesInMultiline: true
+
+Style/TrailingCommaInLiteral:
+  EnforcedStyleForMultiline: comma
