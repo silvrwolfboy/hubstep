@@ -39,4 +39,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop", "~> 0.46.0"
   spec.add_development_dependency "rack-test", "~> 0.6"
   spec.add_development_dependency "activesupport", "~> 4.0"
+  spec.add_development_dependency "faraday", "~> 0.10"
 end
