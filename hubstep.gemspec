@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Adam Roben"]
   spec.email         = ["adam@roben.org"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Standard LightStep tracing of GitHub Ruby apps}
+  spec.description   = %q{Makes it easy to trace Sinatra and Ruby apps that use GitHub conventions.}
+  spec.homepage      = "https://github.com/github/hubstep"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
