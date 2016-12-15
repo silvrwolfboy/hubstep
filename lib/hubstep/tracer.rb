@@ -108,6 +108,8 @@ module HubStep
       end
     end
 
+    # Mimics the interface and no-op behavior of OpenTracing::Span. This is
+    # used when tracing is disabled.
     class InertSpan
       include Singleton
       instance.freeze
@@ -140,6 +142,7 @@ module HubStep
   end
 end
 
+# rubocop:disable Style/Documentation
 module LightStep
   class Span
     module Configurable
@@ -151,3 +154,4 @@ module LightStep
     include Configurable
   end
 end
+# rubocop:enable Style/Documentation

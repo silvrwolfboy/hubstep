@@ -3,6 +3,7 @@
 require "rack"
 
 module HubStep
+  # Rack middleware for wrapping a request in a span.
   class TracerMiddleware
     def initialize(app)
       @app = app
