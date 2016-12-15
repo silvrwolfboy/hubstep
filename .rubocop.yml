@@ -11,6 +11,9 @@ Metrics/BlockLength:
 Metrics/LineLength:
   Max: 100
 
+Style/DoubleNegation:
+  Enabled: false
+
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
 
