@@ -26,21 +26,6 @@ Style/ExtraSpacing:
   Exclude:
     - 'hubstep.gemspec'
 
-# Offense count: 8
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: when_needed, always
-Style/FrozenStringLiteralComment:
-  Exclude:
-    - 'Gemfile'
-    - 'Rakefile'
-    - 'bin/console'
-    - 'hubstep.gemspec'
-    - 'lib/hubstep.rb'
-    - 'lib/hubstep/version.rb'
-    - 'test/hubstep_test.rb'
-    - 'test/test_helper.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: SupportedStyles, UseHashRocketsWithSymbolValues, PreferHashRocketsForNonAlnumEndingSymbols.
