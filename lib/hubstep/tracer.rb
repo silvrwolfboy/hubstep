@@ -4,6 +4,9 @@ require "lightstep"
 require "singleton"
 
 module HubStep
+  # Tracer wraps LightStep::Tracer. It provides a block-based API for creating
+  # and configuring spans and support for enabling and disabling tracing at
+  # runtime. A global instance is available via HubStep.tracer.
   class Tracer
     def initialize(transport: nil, tags: {})
       host = ENV["LIGHTSTEP_COLLECTOR_HOST"]
