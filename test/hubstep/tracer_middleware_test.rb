@@ -22,10 +22,10 @@ module HubStep
 
     def test_wraps_request_in_span
       top_span = nil
-      @block = lambda { |_env|
+      @block = lambda do |_env|
         top_span = HubStep.tracer.top_span
         [302, {}, "<html>"]
-      }
+      end
 
       get "/foo"
 
@@ -39,10 +39,10 @@ module HubStep
 
     def test_records_request_id_if_present
       top_span = nil
-      @block = lambda { |_env|
+      @block = lambda do |_env|
         top_span = HubStep.tracer.top_span
         [302, {}, "<html>"]
-      }
+      end
 
       get "/foo", {}, { "HTTP_X_GITHUB_REQUEST_ID" => "1234abcd" }
 
@@ -53,9 +53,7 @@ module HubStep
       test_instance = self
       @app ||= Rack::Builder.new do
         use HubStep::TracerMiddleware
-        run lambda { |env|
-          test_instance.block.call(env)
-        }
+        run ->(env) { test_instance.block.call(env) }
       end
     end
   end

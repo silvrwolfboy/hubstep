@@ -42,9 +42,9 @@ class TracingInstrumentorTest < Minitest::Test
 
   def test_sends_notifications
     event = nil
-    callback = lambda { |*args|
+    callback = lambda do |*args|
       event = ActiveSupport::Notifications::Event.new(*args)
-    }
+    end
     payload = { :bar => :baz }
     ActiveSupport::Notifications.subscribed(callback, "foo") do
       @instrumenter.instrument("foo", payload)
