@@ -25,6 +25,16 @@ module HubStep
         @tracer ||= Tracer.new
       end
 
+      def test_requires_a_tracer
+        app = ::Rack::Builder.new do
+          use HubStep::Rack::Middleware
+          run ->(_env) { [200, {}, "<html>"] }
+        end
+        assert_raises ArgumentError do
+          app.to_app
+        end
+      end
+
       def test_wraps_request_in_span
         top_span = nil
         @block = lambda do |_env|
