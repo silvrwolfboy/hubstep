@@ -6,13 +6,14 @@ module HubStep
   module Rack
     # Rack middleware for wrapping a request in a span.
     class Middleware
-      def initialize(app, tracer)
+      def initialize(app, tracer, enabled_block)
         @app = app
         @tracer = tracer
+        @enabled_block = enabled_block
       end
 
       def call(env)
-        @tracer.with_enabled(HubStep.tracing_enabled?) do
+        @tracer.with_enabled(@enabled_block.call(env)) do
           trace(env) do
             @app.call(env)
           end
