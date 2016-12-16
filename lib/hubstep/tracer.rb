@@ -9,6 +9,11 @@ module HubStep
   # and configuring spans and support for enabling and disabling tracing at
   # runtime.
   class Tracer
+    # Create a Tracer.
+    #
+    # tags      - Hash of tags to assign to the tracer. These will be
+    #             associated with every span the tracer creates.
+    # transport - instance of a LightStep::Transport::Base subclass
     def initialize(transport: default_transport, tags: {})
       name = HubStep.server_metadata.values_at("app", "role").join("-")
 
@@ -27,8 +32,13 @@ module HubStep
       !!@enabled
     end
 
+    # Enable/disable the tracer at runtime
+    #
+    # When disabled, all #span blocks will be passed InertSpans instead of real
+    # spans. Operations on InertSpan are no-ops.
     attr_writer :enabled
 
+    # Enable/disable the tracer within a block
     def with_enabled(value)
       original = enabled?
       self.enabled = value
@@ -37,16 +47,38 @@ module HubStep
       self.enabled = original
     end
 
+    # Get the topmost span in the stack
+    #
+    # This is the span that has no parent span; the rest of the spans in the
+    # stack descend from it.
+    #
+    # Returns a LightStep::Span or InertSpan.
     def top_span
       span = @spans.first if enabled?
       span || InertSpan.instance
     end
 
+    # Get the bottommost span in the stack
+    #
+    # This is the span that has no children.
+    #
+    # Returns a LightStep::Span or InertSpan.
     def bottom_span
       span = @spans.last if enabled?
       span || InertSpan.instance
     end
 
+    # Record a span representing the execution of the given block
+    #
+    # operation_name - short human-readable String identifying the work done by the span
+    # start_time     - Time instance representing when the span began
+    # tags           - Hash of String => String tags to add to the span
+    # finish         - Boolean indicating whether to "finish" (i.e., record the
+    #                  span's end time and submit it to the collector).
+    #                  Defaults to true.
+    #
+    # Yields a LightStep::Span or InertSpan to the block. Returns the block's
+    # return value.
     def span(operation_name, start_time: nil, tags: nil, finish: true)
       unless enabled?
         return yield InertSpan.instance
@@ -69,6 +101,12 @@ module HubStep
       end
     end
 
+    # Record an exception that happened during a span
+    #
+    # span      - Span or InertSpan instance
+    # exception - Exception instance
+    #
+    # Returns nothing.
     def record_exception(span, exception)
       span.configure do
         span.set_tag("error", true)
@@ -77,6 +115,12 @@ module HubStep
       end
     end
 
+    # Submit all buffered spans to the collector
+    #
+    # This happens automatically so you probably don't need to call this
+    # outside of tests.
+    #
+    # Returns nothing.
     def flush
       @tracer.flush if enabled?
     end

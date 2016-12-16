@@ -7,6 +7,9 @@ require "socket"
 
 #:nodoc:
 module HubStep
+  # Internal: Get this machine's hostname.
+  #
+  # Returns a String.
   def self.hostname
     @hostname ||= Socket.gethostname.freeze
   end

@@ -3,10 +3,11 @@
 require "English"
 require "failbot"
 
-# rubocop:disable Style/Documentation
 module LightStep
   module Transport
-    class HTTPJSON
+    class HTTPJSON # rubocop:disable Style/Documentation
+      # This reimplementation of LightStep::Transport::HTTPJSON#report reports
+      # network errors and other exceptions to Failbot.
       module Failbot
         class HTTPError < StandardError; end
 

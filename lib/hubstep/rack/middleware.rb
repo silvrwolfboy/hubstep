@@ -6,14 +6,21 @@ module HubStep
   module Rack
     # Rack middleware for wrapping a request in a span.
     class Middleware
-      def initialize(app, tracer, enabled_proc)
+      # Create a Middleware
+      #
+      # tracer    - a HubStep::Tracer instance
+      # enable_if - Proc that is passed the env for each request. If the Proc
+      #             returns true, the tracer will be enabled for the duration
+      #             of the request. If the Proc returns false, the tracer will
+      #             be disabled for the duration of the request.
+      def initialize(app, tracer, enable_if)
         @app = app
         @tracer = tracer
-        @enabled_proc = enabled_proc
+        @enable_if = enable_if
       end
 
       def call(env)
-        @tracer.with_enabled(@enabled_proc.call(env)) do
+        @tracer.with_enabled(@enable_if.call(env)) do
           trace(env) do
             @app.call(env)
           end
