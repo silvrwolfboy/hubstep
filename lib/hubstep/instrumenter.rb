@@ -5,7 +5,7 @@ require "active_support/notifications"
 module HubStep
   # Wrapper around ActiveSupport::Notifications that traces instrumented
   # blocks.
-  class TracingInstrumenter
+  class Instrumenter
     def initialize(tracer)
       @tracer = tracer
     end
