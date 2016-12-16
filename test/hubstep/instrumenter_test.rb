@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 require_relative "../test_helper"
-require "hubstep/tracing_instrumenter"
+require "hubstep/instrumenter"
+require "active_support/notifications"
 
 module HubStep
-  class TracingInstrumentorTest < Minitest::Test
+  class InstrumentorTest < Minitest::Test
     def setup
       @tracer = Tracer.new
       @tracer.enabled = true
-      @instrumenter = TracingInstrumenter.new(@tracer)
+      @instrumenter = Instrumenter.new(@tracer, ActiveSupport::Notifications)
     end
 
     def test_traces_instrumented_blocks
