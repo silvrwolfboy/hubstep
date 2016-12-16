@@ -23,7 +23,7 @@ module HubStep
       private
 
       def trace(env)
-        @tracer.span("request") do |span|
+        @tracer.span("Rack #{env["REQUEST_METHOD"]}") do |span|
           span.configure do
             add_tags(span, ::Rack::Request.new(env))
           end
@@ -44,6 +44,7 @@ module HubStep
 
       def tags(request)
         tags = {
+          "component" => "rack",
           "span.kind" => "server",
           "http.url" => request.url,
           "http.method" => request.request_method,

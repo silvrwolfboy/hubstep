@@ -83,7 +83,7 @@ module HubStep
         assert tracer.enabled?
       end
 
-      def test_wraps_request_in_span
+      def test_wraps_request_in_span # rubocop:disable Metrics/MethodLength
         top_span = nil
         @request_proc = lambda do |_env|
           top_span = tracer.top_span
@@ -93,13 +93,14 @@ module HubStep
         get "/foo"
 
         expected = {
+          "component" => "rack",
           "http.method" => "GET",
           "http.status_code" => "302",
           "http.url" => "http://example.org/foo",
           "span.kind" => "server",
         }
 
-        assert_equal "request", top_span.operation_name
+        assert_equal "Rack GET", top_span.operation_name
         assert_equal expected, top_span.tags.select { |key, _value| expected.key?(key) }
         refute_includes top_span.tags, "guid:github_request_id"
       end
