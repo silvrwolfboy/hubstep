@@ -9,10 +9,10 @@ module HubStep
     class MiddlewareTest < Minitest::Test
       include ::Rack::Test::Methods
 
-      attr_reader :proc, :enabled_proc
+      attr_reader :request_proc, :enabled_proc
 
       def setup
-        @proc = ->(_env) { [200, {}, "<html>"] }
+        @request_proc = ->(_env) { [200, {}, "<html>"] }
         @enabled_proc = ->(_env) { true }
       end
 
@@ -56,7 +56,7 @@ module HubStep
       def test_enables_tracing_during_request_if_specified
         tracer.enabled = false
         enabled_in_request = nil
-        @proc = lambda do |_env|
+        @request_proc = lambda do |_env|
           enabled_in_request = tracer.enabled?
           [200, {}, "<html>"]
         end
@@ -71,7 +71,7 @@ module HubStep
       def test_disables_tracing_during_request_if_specified
         tracer.enabled = true
         enabled_in_request = nil
-        @proc = lambda do |_env|
+        @request_proc = lambda do |_env|
           enabled_in_request = tracer.enabled?
           [200, {}, "<html>"]
         end
@@ -83,9 +83,9 @@ module HubStep
         assert tracer.enabled?
       end
 
-      def test_wraps_request_in_span
+      def test_wraps_request_in_span # rubocop:disable Metrics/MethodLength
         top_span = nil
-        @proc = lambda do |_env|
+        @request_proc = lambda do |_env|
           top_span = tracer.top_span
           [302, {}, "<html>"]
         end
@@ -93,20 +93,21 @@ module HubStep
         get "/foo"
 
         expected = {
+          "component" => "rack",
           "http.method" => "GET",
           "http.status_code" => "302",
           "http.url" => "http://example.org/foo",
           "span.kind" => "server",
         }
 
-        assert_equal "request", top_span.operation_name
+        assert_equal "Rack GET", top_span.operation_name
         assert_equal expected, top_span.tags.select { |key, _value| expected.key?(key) }
         refute_includes top_span.tags, "guid:github_request_id"
       end
 
       def test_records_request_id_if_present
         top_span = nil
-        @proc = lambda do |_env|
+        @request_proc = lambda do |_env|
           top_span = tracer.top_span
           [302, {}, "<html>"]
         end
@@ -120,7 +121,7 @@ module HubStep
         test_instance = self
         @app ||= ::Rack::Builder.new do
           use HubStep::Rack::Middleware, test_instance.tracer, test_instance.enabled_proc
-          run ->(env) { test_instance.proc.call(env) }
+          run ->(env) { test_instance.request_proc.call(env) }
         end
       end
     end
