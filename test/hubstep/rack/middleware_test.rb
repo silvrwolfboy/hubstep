@@ -14,12 +14,6 @@ module HubStep
       def setup
         @block = ->(_env) { [200, {}, "<html>"] }
         @enabled_block = ->(_env) { true }
-        @original_enabled = HubStep.tracing_enabled?
-        HubStep.tracing_enabled = true
-      end
-
-      def teardown
-        HubStep.tracing_enabled = @original_enabled
       end
 
       def tracer
