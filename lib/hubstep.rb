@@ -7,14 +7,6 @@ require "socket"
 
 #:nodoc:
 module HubStep
-  def self.tracing_enabled=(value)
-    @tracing_enabled = value
-  end
-
-  def self.tracing_enabled?
-    !!@tracing_enabled
-  end
-
   def self.hostname
     @hostname ||= Socket.gethostname.freeze
   end
