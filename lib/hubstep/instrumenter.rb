@@ -1,13 +1,18 @@
 # frozen_string_literal: true
 
-require "active_support/notifications"
-
 module HubStep
   # Wrapper around ActiveSupport::Notifications that traces instrumented
   # blocks.
   class Instrumenter
-    def initialize(tracer)
+    # Creates an Instrumenter
+    #
+    # tracer  - HubStep::Tracer instance
+    # service - Object that provides ActiveSupport::Notifications' API (i.e.,
+    #           you could just pass ActiveSupport::Notifications here, or wrap
+    #           it in some other object).
+    def initialize(tracer, service)
       @tracer = tracer
+      @service = service
     end
 
     def publish(name, *args)
@@ -36,8 +41,6 @@ module HubStep
 
     private
 
-    def service
-      ActiveSupport::Notifications
-    end
+    attr_reader :service
   end
 end

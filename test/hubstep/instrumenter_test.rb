@@ -2,13 +2,14 @@
 
 require_relative "../test_helper"
 require "hubstep/instrumenter"
+require "active_support/notifications"
 
 module HubStep
   class InstrumentorTest < Minitest::Test
     def setup
       @tracer = Tracer.new
       @tracer.enabled = true
-      @instrumenter = Instrumenter.new(@tracer)
+      @instrumenter = Instrumenter.new(@tracer, ActiveSupport::Notifications)
     end
 
     def test_traces_instrumented_blocks
