@@ -129,6 +129,18 @@ module HubStep
         assert_equal "Rack GET", span.operation_name
       end
 
+      def test_get_span_returns_inert_span_when_using_middleware
+        span = nil
+        @app = lambda do |env|
+          span = HubStep::Rack::Middleware.get_span(env)
+          [302, {}, "<html>"]
+        end
+
+        get "/foo"
+
+        assert_kind_of HubStep::Tracer::InertSpan, span
+      end
+
       def app
         test_instance = self
         @app ||= ::Rack::Builder.new do
