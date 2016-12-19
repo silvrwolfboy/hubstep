@@ -8,6 +8,11 @@ module HubStep
     class Middleware
       SPAN = "#{name}.span"
 
+      # Get the span that represents this request
+      #
+      # env - a Rack env Hash
+      #
+      # Returns a Span.
       def self.get_span(env)
         env[SPAN]
       end
