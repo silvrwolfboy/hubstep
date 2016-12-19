@@ -6,6 +6,12 @@ module HubStep
   module Rack
     # Rack middleware for wrapping a request in a span.
     class Middleware
+      SPAN = "#{name}.span"
+
+      def self.get_span(env)
+        env[SPAN]
+      end
+
       # Create a Middleware
       #
       # tracer    - a HubStep::Tracer instance
@@ -31,6 +37,8 @@ module HubStep
 
       def trace(env)
         @tracer.span("Rack #{env["REQUEST_METHOD"]}") do |span|
+          env[SPAN] = span
+
           span.configure do
             add_tags(span, ::Rack::Request.new(env))
           end

@@ -117,6 +117,18 @@ module HubStep
         assert_equal "1234abcd", top_span.tags["guid:github_request_id"]
       end
 
+      def test_stores_span_on_env
+        span = nil
+        @request_proc = lambda do |env|
+          span = HubStep::Rack::Middleware.get_span(env)
+          [302, {}, "<html>"]
+        end
+
+        get "/foo"
+
+        assert_equal "Rack GET", span.operation_name
+      end
+
       def app
         test_instance = self
         @app ||= ::Rack::Builder.new do
