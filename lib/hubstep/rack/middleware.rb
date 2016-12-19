@@ -14,7 +14,7 @@ module HubStep
       #
       # Returns a Span.
       def self.get_span(env)
-        env[SPAN]
+        env[SPAN] || Tracer::InertSpan.instance
       end
 
       # Create a Middleware
