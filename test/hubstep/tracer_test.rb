@@ -36,33 +36,6 @@ module HubStep
       assert_predicate tracer, :enabled?
     end
 
-    def test_top_span_returns_inert_instance_when_not_tracing
-      assert_equal HubStep::Tracer::InertSpan.instance, HubStep::Tracer.new.top_span
-    end
-
-    def test_top_span_returns_inert_instance_when_tracing_disabled
-      tracer = HubStep::Tracer.new
-      tracer.enabled = true
-      span = nil
-      tracer.span("foo") do
-        tracer.with_enabled(false) do
-          span = tracer.top_span
-        end
-      end
-      assert_equal HubStep::Tracer::InertSpan.instance, span
-    end
-
-    def test_top_span_returns_top_span_when_tracing
-      tracer = HubStep::Tracer.new
-      tracer.enabled = true
-      tracer.span("foo") do |top_span|
-        assert_equal top_span, tracer.top_span
-        tracer.span("bar") do
-          assert_equal top_span, tracer.top_span
-        end
-      end
-    end
-
     def test_bottom_span_returns_inert_instance_when_not_tracing
       assert_equal HubStep::Tracer::InertSpan.instance, HubStep::Tracer.new.bottom_span
     end
