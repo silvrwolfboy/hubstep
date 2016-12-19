@@ -39,22 +39,24 @@ module HubStep
         @tracer.span("Rack #{env["REQUEST_METHOD"]}") do |span|
           env[SPAN] = span
 
-          span.configure do
-            add_tags(span, ::Rack::Request.new(env))
-          end
+          span.configure { record_request(span, env) }
 
           result = yield
 
-          span.set_tag("http.status_code", result[0].to_s)
+          span.configure { record_response(span, *result) }
 
           result
         end
       end
 
-      def add_tags(span, request)
-        tags(request).each do |key, value|
+      def record_request(span, env)
+        tags(::Rack::Request.new(env)).each do |key, value|
           span.set_tag(key, value)
         end
+      end
+
+      def record_response(span, status, _headers, _body)
+        span.set_tag("http.status_code", status)
       end
 
       def tags(request)
