@@ -47,17 +47,6 @@ module HubStep
       self.enabled = original
     end
 
-    # Get the topmost span in the stack
-    #
-    # This is the span that has no parent span; the rest of the spans in the
-    # stack descend from it.
-    #
-    # Returns a LightStep::Span or InertSpan.
-    def top_span
-      span = @spans.first if enabled?
-      span || InertSpan.instance
-    end
-
     # Get the bottommost span in the stack
     #
     # This is the span that has no children.

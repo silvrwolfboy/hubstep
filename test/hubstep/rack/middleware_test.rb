@@ -84,9 +84,9 @@ module HubStep
       end
 
       def test_wraps_request_in_span # rubocop:disable Metrics/MethodLength
-        top_span = nil
+        span = nil
         @request_proc = lambda do |_env|
-          top_span = tracer.top_span
+          span = tracer.bottom_span
           [302, {}, "<html>"]
         end
 
@@ -100,21 +100,33 @@ module HubStep
           "span.kind" => "server",
         }
 
-        assert_equal "Rack GET", top_span.operation_name
-        assert_equal expected, top_span.tags.select { |key, _value| expected.key?(key) }
-        refute_includes top_span.tags, "guid:github_request_id"
+        assert_equal "Rack GET", span.operation_name
+        assert_equal expected, span.tags.select { |key, _value| expected.key?(key) }
+        refute_includes span.tags, "guid:github_request_id"
       end
 
       def test_records_request_id_if_present
-        top_span = nil
+        span = nil
         @request_proc = lambda do |_env|
-          top_span = tracer.top_span
+          span = tracer.bottom_span
           [302, {}, "<html>"]
         end
 
         get "/foo", {}, "HTTP_X_GITHUB_REQUEST_ID" => "1234abcd"
 
-        assert_equal "1234abcd", top_span.tags["guid:github_request_id"]
+        assert_equal "1234abcd", span.tags["guid:github_request_id"]
+      end
+
+      def test_stores_span_on_env
+        span = nil
+        @request_proc = lambda do |env|
+          span = HubStep::Rack::Middleware.get_span(env)
+          [302, {}, "<html>"]
+        end
+
+        get "/foo"
+
+        assert_equal "Rack GET", span.operation_name
       end
 
       def app
