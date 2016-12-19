@@ -7,8 +7,8 @@ require "hubstep/version"
 Gem::Specification.new do |spec|
   spec.name          = "hubstep"
   spec.version       = HubStep::VERSION
-  spec.authors       = ["Adam Roben"]
-  spec.email         = ["adam@roben.org"]
+  spec.authors       = ["GitHub"]
+  spec.email         = ["engineering@github.com"]
 
   spec.summary       = "Standard LightStep tracing of GitHub Ruby apps"
   spec.description   = "Makes it easy to trace Sinatra and Ruby apps that use GitHub conventions."
