@@ -45,7 +45,7 @@ module HubStep
 
           result = yield
 
-          span.set_tag("http.status_code", result[0].to_s)
+          span.set_tag("http.status_code", result[0])
 
           result
         end
