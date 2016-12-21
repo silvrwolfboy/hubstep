@@ -32,7 +32,7 @@ module HubStep
 
       def test_requires_an_enabled_proc
         app = ::Rack::Builder.new do
-          use HubStep::Rack::Middleware, HubStep::Tracer.new
+          use HubStep::Rack::Middleware, tracer: HubStep::Tracer.new
           run ->(_env) { [200, {}, "<html>"] }
         end
         assert_raises ArgumentError do
@@ -144,8 +144,10 @@ module HubStep
       def app
         test_instance = self
         @app ||= ::Rack::Builder.new do
-          use HubStep::Rack::Middleware, test_instance.tracer, test_instance.enabled_proc
-          run ->(env) { test_instance.request_proc.call(env) }
+          use HubStep::Rack::Middleware,
+              tracer: test_instance.tracer,
+              enable_if: test_instance.enabled_proc
+          run test_instance.request_proc
         end
       end
     end

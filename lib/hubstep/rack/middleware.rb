@@ -24,7 +24,7 @@ module HubStep
       #             returns true, the tracer will be enabled for the duration
       #             of the request. If the Proc returns false, the tracer will
       #             be disabled for the duration of the request.
-      def initialize(app, tracer, enable_if)
+      def initialize(app, tracer:, enable_if:)
         @app = app
         @tracer = tracer
         @enable_if = enable_if
