@@ -24,10 +24,15 @@ module HubStep
       #             returns true, the tracer will be enabled for the duration
       #             of the request. If the Proc returns false, the tracer will
       #             be disabled for the duration of the request.
-      def initialize(app, tracer:, enable_if:)
+      # include_urls - Boolean specifying whether the `http.url` tag should be
+      #                added to the spans this middleware creates. URLs can
+      #                contain sensitive information, so they are omitted by
+      #                default.
+      def initialize(app, tracer:, enable_if:, include_urls: false)
         @app = app
         @tracer = tracer
         @enable_if = enable_if
+        @include_urls = include_urls
       end
 
       def call(env)
@@ -68,9 +73,11 @@ module HubStep
         tags = {
           "component" => "rack",
           "span.kind" => "server",
-          "http.url" => request.url,
           "http.method" => request.request_method,
         }
+        if @include_urls
+          tags["http.url"] = request.url
+        end
         id = request_id(request)
         if id
           tags["guid:github_request_id"] = id

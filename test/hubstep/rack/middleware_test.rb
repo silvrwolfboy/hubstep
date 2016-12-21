@@ -92,17 +92,52 @@ module HubStep
 
         get "/foo"
 
-        expected = {
-          "component" => "rack",
-          "http.method" => "GET",
-          "http.status_code" => "302",
-          "http.url" => "http://example.org/foo",
-          "span.kind" => "server",
-        }
-
         assert_equal "Rack GET", span.operation_name
-        assert_equal expected, span.tags.select { |key, _value| expected.key?(key) }
-        refute_includes span.tags, "guid:github_request_id"
+        assert_equal "rack", span.tags["component"]
+        assert_equal "GET", span.tags["http.method"]
+        assert_equal "302", span.tags["http.status_code"]
+        assert_equal "server", span.tags["span.kind"]
+      end
+
+      def test_omits_urls_by_default
+        span = nil
+        @request_proc = lambda do |env|
+          span = HubStep::Rack::Middleware.get_span(env)
+          [302, {}, "<html>"]
+        end
+
+        test_instance = self
+        @app = ::Rack::Builder.new do
+          use HubStep::Rack::Middleware,
+              tracer: test_instance.tracer,
+              enable_if: test_instance.enabled_proc
+          run test_instance.request_proc
+        end
+
+        get "/foo"
+
+        refute_includes span.tags, "http.url"
+      end
+
+      def test_includes_urls_if_specified
+        span = nil
+        @request_proc = lambda do |env|
+          span = HubStep::Rack::Middleware.get_span(env)
+          [302, {}, "<html>"]
+        end
+
+        test_instance = self
+        @app = ::Rack::Builder.new do
+          use HubStep::Rack::Middleware,
+              tracer: test_instance.tracer,
+              enable_if: test_instance.enabled_proc,
+              include_urls: true
+          run test_instance.request_proc
+        end
+
+        get "/foo"
+
+        assert_equal "http://example.org/foo", span.tags["http.url"]
       end
 
       def test_records_request_id_if_present
