@@ -31,5 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rack-test", "~> 0.6"
   spec.add_development_dependency "activesupport", "~> 4.0"
   spec.add_development_dependency "faraday", "~> 0.10"
+  spec.add_development_dependency "failbot", "~> 2.0.0"
+  spec.add_development_dependency "webmock", "~> 2.3.1"
   spec.add_development_dependency "pry-byebug"
 end
