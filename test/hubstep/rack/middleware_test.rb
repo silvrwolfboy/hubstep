@@ -83,7 +83,37 @@ module HubStep
         assert tracer.enabled?
       end
 
-      def test_wraps_request_in_span # rubocop:disable Metrics/MethodLength
+      def test_records_request_method
+        span = nil
+        @request_proc = lambda do |env|
+          span = HubStep::Rack::Middleware.get_span(env)
+          [302, {}, "<html>"]
+        end
+
+        get "/foo"
+        assert_equal "Rack GET", span.operation_name
+        assert_equal "GET", span.tags["http.method"]
+        post "/bar"
+        assert_equal "Rack POST", span.operation_name
+        assert_equal "POST", span.tags["http.method"]
+      end
+
+      def test_records_status_code
+        span = nil
+        @request_proc = lambda do |env|
+          span = HubStep::Rack::Middleware.get_span(env)
+          [@status_code, {}, "<html>"]
+        end
+
+        @status_code = 200
+        get "/foo"
+        assert_equal "200", span.tags["http.status_code"]
+        @status_code = 404
+        get "/foo"
+        assert_equal "404", span.tags["http.status_code"]
+      end
+
+      def test_wraps_request_in_span
         span = nil
         @request_proc = lambda do |_env|
           span = tracer.bottom_span
@@ -92,10 +122,7 @@ module HubStep
 
         get "/foo"
 
-        assert_equal "Rack GET", span.operation_name
         assert_equal "rack", span.tags["component"]
-        assert_equal "GET", span.tags["http.method"]
-        assert_equal "302", span.tags["http.status_code"]
         assert_equal "server", span.tags["span.kind"]
       end
 
