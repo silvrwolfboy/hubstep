@@ -32,7 +32,7 @@ module HubStep
 
       def test_requires_an_enabled_proc
         app = ::Rack::Builder.new do
-          use HubStep::Rack::Middleware, HubStep::Tracer.new
+          use HubStep::Rack::Middleware, tracer: HubStep::Tracer.new
           run ->(_env) { [200, {}, "<html>"] }
         end
         assert_raises ArgumentError do
@@ -83,7 +83,37 @@ module HubStep
         assert tracer.enabled?
       end
 
-      def test_wraps_request_in_span # rubocop:disable Metrics/MethodLength
+      def test_records_request_method
+        span = nil
+        @request_proc = lambda do |env|
+          span = HubStep::Rack::Middleware.get_span(env)
+          [302, {}, "<html>"]
+        end
+
+        get "/foo"
+        assert_equal "Rack GET", span.operation_name
+        assert_equal "GET", span.tags["http.method"]
+        post "/bar"
+        assert_equal "Rack POST", span.operation_name
+        assert_equal "POST", span.tags["http.method"]
+      end
+
+      def test_records_status_code
+        span = nil
+        @request_proc = lambda do |env|
+          span = HubStep::Rack::Middleware.get_span(env)
+          [@status_code, {}, "<html>"]
+        end
+
+        @status_code = 200
+        get "/foo"
+        assert_equal "200", span.tags["http.status_code"]
+        @status_code = 404
+        get "/foo"
+        assert_equal "404", span.tags["http.status_code"]
+      end
+
+      def test_wraps_request_in_span
         span = nil
         @request_proc = lambda do |_env|
           span = tracer.bottom_span
@@ -92,17 +122,49 @@ module HubStep
 
         get "/foo"
 
-        expected = {
-          "component" => "rack",
-          "http.method" => "GET",
-          "http.status_code" => "302",
-          "http.url" => "http://example.org/foo",
-          "span.kind" => "server",
-        }
+        assert_equal "rack", span.tags["component"]
+        assert_equal "server", span.tags["span.kind"]
+      end
 
-        assert_equal "Rack GET", span.operation_name
-        assert_equal expected, span.tags.select { |key, _value| expected.key?(key) }
-        refute_includes span.tags, "guid:github_request_id"
+      def test_omits_urls_by_default
+        span = nil
+        @request_proc = lambda do |env|
+          span = HubStep::Rack::Middleware.get_span(env)
+          [302, {}, "<html>"]
+        end
+
+        test_instance = self
+        @app = ::Rack::Builder.new do
+          use HubStep::Rack::Middleware,
+              tracer: test_instance.tracer,
+              enable_if: test_instance.enabled_proc
+          run test_instance.request_proc
+        end
+
+        get "/foo"
+
+        refute_includes span.tags, "http.url"
+      end
+
+      def test_includes_urls_if_specified
+        span = nil
+        @request_proc = lambda do |env|
+          span = HubStep::Rack::Middleware.get_span(env)
+          [302, {}, "<html>"]
+        end
+
+        test_instance = self
+        @app = ::Rack::Builder.new do
+          use HubStep::Rack::Middleware,
+              tracer: test_instance.tracer,
+              enable_if: test_instance.enabled_proc,
+              include_urls: true
+          run test_instance.request_proc
+        end
+
+        get "/foo"
+
+        assert_equal "http://example.org/foo", span.tags["http.url"]
       end
 
       def test_records_request_id_if_present
@@ -144,8 +206,10 @@ module HubStep
       def app
         test_instance = self
         @app ||= ::Rack::Builder.new do
-          use HubStep::Rack::Middleware, test_instance.tracer, test_instance.enabled_proc
-          run ->(env) { test_instance.request_proc.call(env) }
+          use HubStep::Rack::Middleware,
+              tracer: test_instance.tracer,
+              enable_if: test_instance.enabled_proc
+          run test_instance.request_proc
         end
       end
     end
