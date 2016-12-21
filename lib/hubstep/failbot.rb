@@ -12,8 +12,9 @@ module LightStep
         class HTTPError < StandardError; end
 
         # There's no way to call through to the normal implementation while getting
-        # access to the response object, so we just copy all the code here.
-        def report(report) # rubocop:disable Metrics/AbcSize
+        # access to the request/response objects, so we just copy all the code
+        # here.
+        def report(report) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
           p report if @verbose >= 3
 
           https = Net::HTTP.new(@host, @port)
@@ -23,6 +24,9 @@ module LightStep
           req["Content-Type"] = "application/json"
           req["Connection"] = "keep-alive"
           req.body = report.to_json
+
+          ::Failbot.push(request_body: req.body)
+
           res = https.request(req)
 
           puts res.to_s, res.body if @verbose >= 3
@@ -32,6 +36,7 @@ module LightStep
           nil
         ensure
           ::Failbot.report!($ERROR_INFO) if $ERROR_INFO
+          ::Failbot.pop
         end
 
         def track_error(res)
