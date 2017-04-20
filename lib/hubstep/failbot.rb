@@ -43,11 +43,9 @@ module LightStep
           return unless res.is_a?(Net::HTTPClientError) || res.is_a?(Net::HTTPServerError)
           exception = HTTPError.new("#{res.code} #{res.message}")
           exception.set_backtrace(caller)
-          ::Failbot.report!(exception, {
-            app: "lightstep",
-            response_body: res.body,
-            response_uri: res.uri,
-          })
+          ::Failbot.report!(exception, app: "lightstep",
+                                       response_body: res.body,
+                                       response_uri: res.uri)
         end
       end
 
