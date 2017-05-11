@@ -78,7 +78,7 @@ end
 
 ### Faraday
 
-[`HubStep::Faraday::Middlware`][fm] is a [Faraday][] middleware that wraps each
+[`HubStep::Faraday::Middleware`][fm] is a [Faraday][] middleware that wraps each
 request in a span.
 
 ```ruby

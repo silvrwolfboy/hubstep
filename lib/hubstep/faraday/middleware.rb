@@ -5,7 +5,7 @@ require "faraday"
 
 module HubStep
   module Faraday
-    # Faraday middlware for wrapping a request in a span.
+    # Faraday middleware for wrapping a request in a span.
     #
     # tracer = HubStep::Tracer.new
     # Faraday.new do |b|
