@@ -14,7 +14,8 @@ module HubStep
     # tags      - Hash of tags to assign to the tracer. These will be
     #             associated with every span the tracer creates.
     # transport - instance of a LightStep::Transport::Base subclass
-    def initialize(transport: default_transport, tags: {})
+    # statsd    - a statsd client
+    def initialize(statsd: nil, transport: default_transport(statsd: statsd), tags: {})
       name = HubStep.server_metadata.values_at("app", "role").join("-")
 
       default_tags = {
@@ -116,7 +117,7 @@ module HubStep
 
     private
 
-    def default_transport
+    def default_transport(statsd:)
       host = ENV["LIGHTSTEP_COLLECTOR_HOST"]
       port = ENV["LIGHTSTEP_COLLECTOR_PORT"]
       encryption = ENV["LIGHTSTEP_COLLECTOR_ENCRYPTION"]
@@ -124,11 +125,12 @@ module HubStep
       access_token = ENV["LIGHTSTEP_ACCESS_TOKEN"]
 
       if host && port && encryption && access_token
-        LightStep::Transport::HTTPJSON.new(host: host,
-                                           port: port.to_i,
-                                           encryption: encryption,
-                                           verbose: verbosity,
-                                           access_token: access_token)
+        HubStep::Transport::HTTPJSON.new(host: host,
+                                         port: port.to_i,
+                                         encryption: encryption,
+                                         verbose: verbosity,
+                                         access_token: access_token,
+                                         statsd: statsd)
       else
         LightStep::Transport::Nil.new
       end
