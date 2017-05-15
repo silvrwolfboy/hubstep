@@ -27,7 +27,7 @@ module HubStep
         @port = port
         @verbose = verbose
         @encryption = encryption
-        @increment = statsd ? statsd.public_method(:increment) : Proc.new {}
+        @increment = statsd ? statsd.public_method(:increment) : proc { }
 
         raise LightStep::Tracer::ConfigurationError, "access_token must be a string" unless String === access_token
         raise LightStep::Tracer::ConfigurationError, "access_token cannot be blank"  if access_token.empty?
