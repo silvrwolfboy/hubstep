@@ -3,6 +3,7 @@
 require "English"
 require "lightstep"
 require "singleton"
+require_relative "internal/instrumenter/noop"
 
 module HubStep
   # Tracer wraps LightStep::Tracer. It provides a block-based API for creating
@@ -11,11 +12,12 @@ module HubStep
   class Tracer
     # Create a Tracer.
     #
-    # tags      - Hash of tags to assign to the tracer. These will be
-    #             associated with every span the tracer creates.
-    # transport - instance of a LightStep::Transport::Base subclass
-    # statsd    - a statsd client
-    def initialize(statsd: nil, transport: default_transport(statsd: statsd), tags: {})
+    # instrumenter - an object that responds to the ActiveSupport::Nofitications
+    #                interface, when omitted the Noop instrumenter will be used
+    # tags         - Hash of tags to assign to the tracer. These will be
+    #                associated with every span the tracer creates.
+    # transport    - instance of a LightStep::Transport::Base subclass
+    def initialize(instrumenter: nil, transport: default_transport, tags: {})
       name = HubStep.server_metadata.values_at("app", "role").join("-")
 
       default_tags = {
@@ -25,6 +27,9 @@ module HubStep
       @tracer = LightStep::Tracer.new(component_name: name,
                                       transport: transport,
                                       tags: default_tags.merge(tags))
+
+      @instrumenter ||= HubStep::Internal::Instrumenter::Noop.new
+
       @spans = []
       self.enabled = false
     end
@@ -38,6 +43,8 @@ module HubStep
     # When disabled, all #span blocks will be passed InertSpans instead of real
     # spans. Operations on InertSpan are no-ops.
     attr_writer :enabled
+
+    attr_reader :instrumenter
 
     # Enable/disable the tracer within a block
     def with_enabled(value)
@@ -117,7 +124,7 @@ module HubStep
 
     private
 
-    def default_transport(statsd:)
+    def default_transport
       host = ENV["LIGHTSTEP_COLLECTOR_HOST"]
       port = ENV["LIGHTSTEP_COLLECTOR_PORT"]
       encryption = ENV["LIGHTSTEP_COLLECTOR_ENCRYPTION"]
@@ -129,8 +136,7 @@ module HubStep
                                          port: port.to_i,
                                          encryption: encryption,
                                          verbose: verbosity,
-                                         access_token: access_token,
-                                         statsd: statsd)
+                                         access_token: access_token)
       else
         LightStep::Transport::Nil.new
       end

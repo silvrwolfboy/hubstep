@@ -38,29 +38,30 @@ module HubStep
       def report(report)
         p report if @verbose >= 3
 
-        https = Net::HTTP.new(@host, @port)
-        https.use_ssl = @encryption == ENCRYPTION_TLS
-        req = Net::HTTP::Post.new('/api/v0/reports')
-        req['LightStep-Access-Token'] = @access_token
-        req['Content-Type'] = 'application/json'
-        req['Connection'] = 'keep-alive'
-        req.body = report.to_json
-        res = https.request(req)
+        default_payload = {
+          transporter: self,
+        }
 
-        puts res.to_s, res.body if @verbose >= 3
+        HubStep.instrumenter.instrument('lightstep.transport.report', default_payload) do |payload|
+          https = Net::HTTP.new(@host, @port)
+          https.use_ssl = @encryption == ENCRYPTION_TLS
+          req = Net::HTTP::Post.new('/api/v0/reports')
+          req['LightStep-Access-Token'] = @access_token
+          req['Content-Type'] = 'application/json'
+          req['Connection'] = 'keep-alive'
+          req.body = report.to_json
+          res = https.request(req)
 
-        track_error(res)
+          payload[:request_body] = req.body
+
+          puts res.to_s, res.body if @verbose >= 3
+
+          payload[:response] = response
+        end
 
         nil
-      rescue
-        @increment.call("hubstep.error")
-      end
-
-      private
-
-      def track_error(res)
-        return unless res.is_a?(Net::HTTPClientError) || res.is_a?(Net::HTTPServerError)
-        @increment.call("hubstep.http_error") if res.is_a?(Net::HTTPClientError)
+      rescue => e
+        HubStep.instrumenter.instrument('lightstep.transport.error', error: boom)
       end
     end
   end
