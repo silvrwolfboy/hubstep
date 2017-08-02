@@ -12,12 +12,10 @@ module HubStep
   class Tracer
     # Create a Tracer.
     #
-    # instrumenter - an object that responds to the ActiveSupport::Nofitications
-    #                interface, when omitted the Noop instrumenter will be used
     # tags         - Hash of tags to assign to the tracer. These will be
     #                associated with every span the tracer creates.
     # transport    - instance of a LightStep::Transport::Base subclass
-    def initialize(instrumenter: nil, transport: default_transport, tags: {})
+    def initialize(transport: default_transport, tags: {})
       name = HubStep.server_metadata.values_at("app", "role").join("-")
 
       default_tags = {
@@ -27,8 +25,6 @@ module HubStep
       @tracer = LightStep::Tracer.new(component_name: name,
                                       transport: transport,
                                       tags: default_tags.merge(tags))
-
-      @instrumenter ||= HubStep::Internal::Instrumenter::Noop.new
 
       @spans = []
       self.enabled = false

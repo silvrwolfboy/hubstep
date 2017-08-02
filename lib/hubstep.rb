@@ -26,4 +26,23 @@ module HubStep
         {}.freeze
       end
   end
+
+  # setter for instrumenter that defaults to the Noop instrumenter
+  #
+  # instrumenter - an object that responds to the ActiveSupport::Nofitications
+  #                interface, when omitted the Noop instrumenter will be used
+  #
+  def self.instrumenter=(instrumenter)
+    @instrumenter = instrumenter
+  end
+
+  # getter for the instrumenter ivar. When the ivar isn't set it will
+  # default to the Noop instrumenter
+  #
+  # instrumenter - an object that responds to the ActiveSupport::Nofitications
+  #                interface, when omitted the Noop instrumenter will be used
+  #
+  def self.instrumenter(instrumenter: HubStep::Internal::Instrumenter::Noop.new)
+    @instrumenter ||= instrumenter
+  end
 end
