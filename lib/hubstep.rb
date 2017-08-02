@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "hubstep/tracer"
+require "hubstep/internal/instrumenter/noop"
 require "hubstep/version"
 
 require "socket"

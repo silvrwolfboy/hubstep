@@ -3,7 +3,6 @@
 require "English"
 require "lightstep"
 require "singleton"
-require_relative "internal/instrumenter/noop"
 
 module HubStep
   # Tracer wraps LightStep::Tracer. It provides a block-based API for creating
