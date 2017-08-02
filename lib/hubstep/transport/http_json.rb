@@ -61,7 +61,7 @@ module HubStep
 
         nil
       rescue => e
-        HubStep.instrumenter.instrument('lightstep.transport.error', error: boom)
+        HubStep.instrumenter.instrument('lightstep.transport.error', error: e)
       end
     end
   end
