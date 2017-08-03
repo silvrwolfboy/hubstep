@@ -5,6 +5,7 @@ require "hubstep"
 require "pry-byebug"
 require "minitest/autorun"
 require "webmock/minitest"
+require "mocha/mini_test"
 
 require "failbot"
 ENV["FAILBOT_BACKEND"] ||= "memory"

@@ -179,11 +179,10 @@ module HubStep
     end
 
     def test_the_default_transport_is_correct_when_the_envs_are_set
-      ENV.stub(:[], "foo") do
-        tracer = HubStep::Tracer.new
-        transport = tracer.send(:default_transport)
-        assert_equal HubStep::Transport::HTTPJSON, transport.class
-      end
+      ENV.stubs(:[] => "foo")
+      tracer = HubStep::Tracer.new
+      transport = tracer.send(:default_transport)
+      assert_equal HubStep::Transport::HTTPJSON, transport.class
     end
 
     def test_sets_tags_on_tracer

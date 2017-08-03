@@ -2,7 +2,7 @@
 require "test_helper"
 
 class HubStepTest < Minitest::Test
-  def setup
+  def teardown
     HubStep.instrumenter = nil
   end
 
