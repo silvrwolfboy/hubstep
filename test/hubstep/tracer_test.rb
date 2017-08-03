@@ -178,6 +178,14 @@ module HubStep
       refute_empty reports
     end
 
+    def test_the_default_transport_is_correct_when_the_envs_are_set
+      ENV.stub(:[], "foo") do
+        tracer = HubStep::Tracer.new
+        transport = tracer.send(:default_transport)
+        assert_equal HubStep::Transport::HTTPJSON, transport.class
+      end
+    end
+
     def test_sets_tags_on_tracer
       reports = []
       callback = ->(report) { reports << report }

@@ -3,6 +3,7 @@
 require "English"
 require "lightstep"
 require "singleton"
+require "hubstep/transport/http_json"
 
 module HubStep
   # Tracer wraps LightStep::Tracer. It provides a block-based API for creating
@@ -38,8 +39,6 @@ module HubStep
     # When disabled, all #span blocks will be passed InertSpans instead of real
     # spans. Operations on InertSpan are no-ops.
     attr_writer :enabled
-
-    attr_reader :instrumenter
 
     # Enable/disable the tracer within a block
     def with_enabled(value)

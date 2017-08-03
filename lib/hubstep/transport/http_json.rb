@@ -22,12 +22,11 @@ module HubStep
       # @param access_token [String] access token for LightStep server
       # @param statsd [#increment] a statsd client
       # @return [HTTPJSON]
-      def initialize(host:, port:, verbose:, encryption:, access_token:, statsd:)
+      def initialize(host:, port:, verbose:, encryption:, access_token:)
         @host = host
         @port = port
         @verbose = verbose
         @encryption = encryption
-        @increment = statsd ? statsd.public_method(:increment) : proc { }
 
         raise LightStep::Tracer::ConfigurationError, "access_token must be a string" unless String === access_token
         raise LightStep::Tracer::ConfigurationError, "access_token cannot be blank"  if access_token.empty?
