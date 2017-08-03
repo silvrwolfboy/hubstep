@@ -34,7 +34,7 @@ module HubStep
       end
 
       # Queue a report for sending
-      def report(report)
+      def report(report) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
         p report if @verbose >= 3
 
         default_payload = {

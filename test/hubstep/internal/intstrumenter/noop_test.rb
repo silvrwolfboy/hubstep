@@ -1,12 +1,13 @@
+# frozen_string_literal: true
+
 require_relative "../../../test_helper"
 require "hubstep/internal/instrumenter/noop"
 
 module HubStep
   class NoopTest < Minitest::Test
-
     def test_instrument_yields_the_payload_with_block
       instrumenter = HubStep::Internal::Instrumenter::Noop.new
-      payload = {test: :payload}
+      payload = { test: :payload }
 
       result = instrumenter.instrument("something", payload) { |x| x }
       assert_equal payload, result

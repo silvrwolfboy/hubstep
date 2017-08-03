@@ -2,7 +2,6 @@
 require "test_helper"
 
 class HubStepTest < Minitest::Test
-
   def setup
     HubStep.instrumenter = nil
   end
