@@ -13,32 +13,13 @@ module HubStep
     # When forking, you should first `disable` the tracer, then `enable` it from
     # within the fork (and in the parent post-fork). See
     # `examples/fork_children/main.rb` for an example.
-    class HTTPJSON < LightStep::Transport::Base
-      # Initialize the transport
-      # @param host [String] host of the domain to the endpoind to push data
-      # @param port [Numeric] port on which to connect
-      # @param verbose [Numeric] verbosity level. Right now 0-3 are supported
-      # @param encryption [ENCRYPTION_TLS, ENCRYPTION_NONE] kind of encryption to use
-      # @param access_token [String] access token for LightStep server
-      # @param statsd [#increment] a statsd client
-      # @return [HTTPJSON]
-      def initialize(host:, port:, verbose:, encryption:, access_token:)
-        @host = host
-        @port = port
-        @verbose = verbose
-        @encryption = encryption
-
-        raise LightStep::Tracer::ConfigurationError, "access_token must be a string" unless String === access_token
-        raise LightStep::Tracer::ConfigurationError, "access_token cannot be blank"  if access_token.empty?
-        @access_token = access_token
-      end
-
+    class HTTPJSON < LightStep::Transport::HTTPJSON
       # Queue a report for sending
       def report(report) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
         p report if @verbose >= 3
 
         default_payload = {
-          transporter: self,
+          transport: self,
         }
 
         HubStep.instrumenter.instrument('lightstep.transport.report', default_payload) do |payload|
@@ -55,7 +36,7 @@ module HubStep
 
           puts res.to_s, res.body if @verbose >= 3
 
-          payload[:response] = response
+          payload[:response] = res
         end
 
         nil
