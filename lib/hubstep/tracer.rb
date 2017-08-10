@@ -14,7 +14,9 @@ module HubStep
     # tags      - Hash of tags to assign to the tracer. These will be
     #             associated with every span the tracer creates.
     # transport - instance of a LightStep::Transport::Base subclass
-    def initialize(transport: default_transport, tags: {})
+    def initialize(transport: default_transport, tags: {}, verbosity: 10)
+      @verbosity = verbosity
+
       name = HubStep.server_metadata.values_at("app", "role").join("-")
 
       default_tags = {
@@ -68,8 +70,9 @@ module HubStep
     #
     # Yields a LightStep::Span or InertSpan to the block. Returns the block's
     # return value.
-    def span(operation_name, start_time: nil, tags: nil, finish: true)
-      unless enabled?
+    def span(operation_name, start_time: nil, tags: nil, finish: true, level: 0)
+      if not enabled? or level > @verbosity
+        # We're not enabled or this span is below our threshold
         return yield InertSpan.instance
       end
 
