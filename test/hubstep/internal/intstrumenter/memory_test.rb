@@ -4,7 +4,7 @@ require_relative "../../../test_helper"
 require "hubstep/internal/instrumenter/memory"
 
 module HubStep
-  class MemoryTest < Minitest::Test
+  class MemoryTest < HubStep::TestCases
     def test_instrument_yields_the_payload_with_block
       instrumenter = HubStep::Internal::Instrumenter::Memory.new
       payload = { test: :payload }

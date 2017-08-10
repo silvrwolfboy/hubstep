@@ -3,7 +3,7 @@
 require_relative "../test_helper"
 
 module HubStep
-  class HTTPJSONTest < Minitest::Test
+  class HTTPJSONTest < HubStep::TestCases
     def default_httpjson
       default_args = {
         host: "foo",
@@ -30,8 +30,6 @@ module HubStep
       assert_equal Net::HTTPOK, event.result.class
       assert event.payload.key?(:request_body)
       assert event.payload.key?(:response)
-
-      HubStep.instrumenter = nil
     end
 
     def test_instruments_an_error_when_reporting # rubocop:disable Metrics/AbcSize
@@ -50,8 +48,6 @@ module HubStep
       assert_equal "lightstep.transport.error", event.name
       assert_nil event.result
       assert_equal error, event.payload[:error]
-
-      HubStep.instrumenter = nil
     end
   end
 end

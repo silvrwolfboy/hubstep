@@ -4,7 +4,7 @@ require_relative "../test_helper"
 
 module HubStep
   # rubocop:disable Metrics/AbcSize
-  class TracerTest < Minitest::Test
+  class TracerTest < HubStep::TestCases
     def test_starts_out_disabled
       refute_predicate HubStep::Tracer.new, :enabled?
     end

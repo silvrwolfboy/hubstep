@@ -4,7 +4,7 @@ require_relative "../../../test_helper"
 require "hubstep/internal/instrumenter/noop"
 
 module HubStep
-  class NoopTest < Minitest::Test
+  class NoopTest < HubStep::TestCases
     def test_instrument_yields_the_payload_with_block
       instrumenter = HubStep::Internal::Instrumenter::Noop.new
       payload = { test: :payload }
