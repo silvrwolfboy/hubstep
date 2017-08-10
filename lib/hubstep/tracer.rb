@@ -71,7 +71,7 @@ module HubStep
     # Yields a LightStep::Span or InertSpan to the block. Returns the block's
     # return value.
     def span(operation_name, start_time: nil, tags: nil, finish: true, level: 0)
-      if not enabled? or level > @verbosity
+      if ! enabled? || level > @verbosity
         # We're not enabled or this span is below our threshold
         return yield InertSpan.instance
       end
