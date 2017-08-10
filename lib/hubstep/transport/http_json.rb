@@ -26,11 +26,7 @@ module HubStep
       def report(report) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
         p report if @verbose >= 3
 
-        default_payload = {
-          transport: self,
-        }
-
-        HubStep.instrumenter.instrument('lightstep.transport.report', default_payload) do |payload|
+        HubStep.instrumenter.instrument('lightstep.transport.report', {}) do |payload|
           https = Net::HTTP.new(@host, @port)
           https.use_ssl = @encryption == ENCRYPTION_TLS
           req = Net::HTTP::Post.new('/api/v0/reports')

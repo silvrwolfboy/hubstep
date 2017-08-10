@@ -28,7 +28,6 @@ module HubStep
 
       assert_equal "lightstep.transport.report", event.name
       assert_equal Net::HTTPOK, event.result.class
-      assert_equal transport, event.payload[:transport]
       assert event.payload.key?(:request_body)
       assert event.payload.key?(:response)
 
