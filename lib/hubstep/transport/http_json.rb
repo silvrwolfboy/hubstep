@@ -2,7 +2,15 @@
 
 require "English"
 require "net/http"
-require "lightstep/transport/base"
+
+unless LightStep::VERSION == '0.10.9'
+  raise <<-MSG
+    This monkey patch needs to be reviewed for LightStep versions other than 0.10.9.
+    To review, diff the changes between the `LightStep::Transport::HTTPJSON#report`
+    method and the `HubStep::Transport::HTTPJSON#report` method below and port any
+    changes that seem necessary.
+  MSG
+end
 
 module HubStep
   module Transport
