@@ -1,0 +1,30 @@
+# Exclude violations in upstream code
+
+# Offense count: 1
+Metrics/AbcSize:
+  Max: 16
+
+# Offense count: 1
+# Configuration parameters: CountKeywordArgs.
+Metrics/ParameterLists:
+  Max: 6
+
+# Offense count: 1
+Style/CaseEquality:
+  Exclude:
+    - 'lib/hubstep/transport/http_json.rb'
+
+# Offense count: 1
+# Cop supports --auto-correct.
+# Configuration parameters: SupportedStyles, EnforcedStyleForEmptyBraces, SpaceBeforeBlockParameters.
+# SupportedStyles: space, no_space
+Style/SpaceInsideBlockBraces:
+  EnforcedStyle: space
+
+# Offense count: 6
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles, ConsistentQuotesInMultiline.
+# SupportedStyles: single_quotes, double_quotes
+Style/StringLiterals:
+  Exclude:
+    - 'lib/hubstep/transport/http_json.rb'

@@ -6,7 +6,7 @@ require "rack/test"
 
 module HubStep
   module Rack
-    class MiddlewareTest < Minitest::Test
+    class MiddlewareTest < HubStep::TestCases
       include ::Rack::Test::Methods
 
       attr_reader :request_proc, :enabled_proc

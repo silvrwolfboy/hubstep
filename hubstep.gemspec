@@ -34,4 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "failbot", "~> 2.0.0"
   spec.add_development_dependency "webmock", "~> 2.3.1"
   spec.add_development_dependency "pry-byebug"
+  spec.add_development_dependency "mocha", "~> 1.2.1"
 end

@@ -4,7 +4,7 @@ require_relative "../test_helper"
 
 module HubStep
   # rubocop:disable Metrics/AbcSize
-  class TracerTest < Minitest::Test
+  class TracerTest < HubStep::TestCases
     def test_starts_out_disabled
       refute_predicate HubStep::Tracer.new, :enabled?
     end
@@ -176,6 +176,13 @@ module HubStep
       tracer.span("foo") { }
       tracer.flush
       refute_empty reports
+    end
+
+    def test_the_default_transport_is_correct_when_the_envs_are_set
+      ENV.stubs(:[] => "foo")
+      tracer = HubStep::Tracer.new
+      transport = tracer.send(:default_transport)
+      assert_equal HubStep::Transport::HTTPJSON, transport.class
     end
 
     def test_sets_tags_on_tracer

@@ -3,6 +3,7 @@
 require "English"
 require "lightstep"
 require "singleton"
+require "hubstep/transport/http_json"
 
 module HubStep
   # Tracer wraps LightStep::Tracer. It provides a block-based API for creating
@@ -11,9 +12,9 @@ module HubStep
   class Tracer
     # Create a Tracer.
     #
-    # tags      - Hash of tags to assign to the tracer. These will be
-    #             associated with every span the tracer creates.
-    # transport - instance of a LightStep::Transport::Base subclass
+    # tags         - Hash of tags to assign to the tracer. These will be
+    #                associated with every span the tracer creates.
+    # transport    - instance of a LightStep::Transport::Base subclass
     def initialize(transport: default_transport, tags: {})
       name = HubStep.server_metadata.values_at("app", "role").join("-")
 
@@ -24,6 +25,7 @@ module HubStep
       @tracer = LightStep::Tracer.new(component_name: name,
                                       transport: transport,
                                       tags: default_tags.merge(tags))
+
       @spans = []
       self.enabled = false
     end
@@ -124,11 +126,11 @@ module HubStep
       access_token = ENV["LIGHTSTEP_ACCESS_TOKEN"]
 
       if host && port && encryption && access_token
-        LightStep::Transport::HTTPJSON.new(host: host,
-                                           port: port.to_i,
-                                           encryption: encryption,
-                                           verbose: verbosity,
-                                           access_token: access_token)
+        HubStep::Transport::HTTPJSON.new(host: host,
+                                         port: port.to_i,
+                                         encryption: encryption,
+                                         verbose: verbosity,
+                                         access_token: access_token)
       else
         LightStep::Transport::Nil.new
       end

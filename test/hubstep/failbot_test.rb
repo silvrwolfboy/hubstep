@@ -5,7 +5,7 @@ require "hubstep/failbot"
 require "rack"
 
 module HubStep
-  class FailbotTest < Minitest::Test
+  class FailbotTest < HubStep::TestCases
     def setup
       Failbot.backend = Failbot::MemoryBackend.new
     end

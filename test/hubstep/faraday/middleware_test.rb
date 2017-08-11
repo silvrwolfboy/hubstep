@@ -5,7 +5,7 @@ require "hubstep/faraday/middleware"
 
 module HubStep
   module Faraday
-    class MiddlewareTest < Minitest::Test
+    class MiddlewareTest < HubStep::TestCases
       def setup
         @reports = []
         callback = ->(report) { @reports << report }
