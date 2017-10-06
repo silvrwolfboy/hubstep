@@ -203,5 +203,22 @@ module HubStep
 
       assert_equal expected, custom_attrs.sort_by { |a| a[:Key] }
     end
+
+    def test_verbosity_false
+      tracer = HubStep::Tracer.new(verbose: false)
+      tracer.enabled = true
+
+      # default level emits (we get a real span)
+      tracer.span("foo") do |foo|
+        assert_instance_of LightStep::Span, foo
+        assert_equal foo, tracer.bottom_span
+      end
+
+      # detail true does not emit
+      tracer.span("baz", detail: true) do |baz|
+        assert_equal HubStep::Tracer::InertSpan.instance, baz
+        assert_equal baz, tracer.bottom_span
+      end
+    end
   end
 end
