@@ -15,7 +15,7 @@ module HubStep
     # tags         - Hash of tags to assign to the tracer. These will be
     #                associated with every span the tracer creates.
     # transport    - instance of a LightStep::Transport::Base subclass
-    # verbose      - Whether or not to emit detail spans, default true
+    # verbose      - Whether or not to emit verbose spans, default true
     def initialize(transport: default_transport, tags: {}, verbose: true)
       @verbose = verbose
 
@@ -62,8 +62,8 @@ module HubStep
       span || InertSpan.instance
     end
 
-    def should_emit?(detail)
-      @verbose || !detail
+    def should_emit?(verbose)
+      @verbose || !verbose
     end
 
     # Record a span representing the execution of the given block
@@ -74,14 +74,14 @@ module HubStep
     # finish         - Boolean indicating whether to "finish" (i.e., record the
     #                  span's end time and submit it to the collector).
     #                  Defaults to true.
-    # detail         - Boolean indicating this is a ancilary span, only
+    # verbose        - Boolean indicating this is a ancilary span, only
     #                  emitted when the tracer has verbose enabled, default
     #                  false
     #
     # Yields a LightStep::Span or InertSpan to the block. Returns the block's
     # return value.
-    def span(operation_name, start_time: nil, tags: nil, finish: true, detail: false)
-      unless enabled? && should_emit?(detail)
+    def span(operation_name, start_time: nil, tags: nil, finish: true, verbose: false)
+      unless enabled? && should_emit?(verbose)
         return yield InertSpan.instance
       end
 

@@ -214,8 +214,8 @@ module HubStep
         assert_equal foo, tracer.bottom_span
       end
 
-      # detail true does not emit
-      tracer.span("baz", detail: true) do |baz|
+      # verbose true does not emit
+      tracer.span("baz", verbose: true) do |baz|
         assert_equal HubStep::Tracer::InertSpan.instance, baz
         assert_equal baz, tracer.bottom_span
       end
