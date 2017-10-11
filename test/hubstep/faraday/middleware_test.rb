@@ -38,7 +38,10 @@ module HubStep
       end
 
       def test_traces_requests_that_raise # rubocop:disable Metrics/MethodLength
-        @stubs.get("http://user:password@test.com/foo") { raise ::Faraday::Error::TimeoutError, "request timed out" }
+        @stubs.get("http://user:password@test.com/foo") do
+          raise ::Faraday::Error::TimeoutError, "request timed out"
+        end
+
         assert_raises ::Faraday::Error::TimeoutError do
           @faraday.get("http://user:password@test.com/foo")
         end
