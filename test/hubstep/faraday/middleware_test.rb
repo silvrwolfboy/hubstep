@@ -21,8 +21,8 @@ module HubStep
       end
 
       def test_traces_requests
-        @stubs.get("/foo") { [202, {}, "bar"] }
-        @faraday.get("/foo")
+        @stubs.get("http://user:password@test.com/foo") { [202, {}, "bar"] }
+        @faraday.get("http://user:password@test.com/foo")
         @stubs.verify_stubbed_calls
         @tracer.flush
 
@@ -30,7 +30,7 @@ module HubStep
         assert_equal "Faraday GET", span[:span_name]
         tags = [
           { Key: "component", Value: "faraday" },
-          { Key: "http.domain", Value: "" },
+          { Key: "http.domain", Value: "test.com" },
           { Key: "http.method", Value: "GET" },
           { Key: "http.status_code", Value: "202" },
         ]
@@ -38,9 +38,9 @@ module HubStep
       end
 
       def test_traces_requests_that_raise # rubocop:disable Metrics/MethodLength
-        @stubs.get("/foo") { raise ::Faraday::Error::TimeoutError, "request timed out" }
+        @stubs.get("http://user:password@test.com/foo") { raise ::Faraday::Error::TimeoutError, "request timed out" }
         assert_raises ::Faraday::Error::TimeoutError do
-          @faraday.get("/foo")
+          @faraday.get("http://user:password@test.com/foo")
         end
         @stubs.verify_stubbed_calls
         @tracer.flush
@@ -52,7 +52,7 @@ module HubStep
           { Key: "error", Value: "true" },
           { Key: "error.class", Value: "Faraday::TimeoutError" },
           { Key: "error.message", Value: "request timed out" },
-          { Key: "http.domain", Value: "" },
+          { Key: "http.domain", Value: "test.com" },
           { Key: "http.method", Value: "GET" },
         ]
         assert_equal tags, span[:attributes].sort_by { |a| a[:Key] }
@@ -64,8 +64,8 @@ module HubStep
           b.adapter(:test, @stubs)
         end
 
-        @stubs.get("/foo") { [202, {}, "bar"] }
-        faraday.get("/foo")
+        @stubs.get("http://user:password@test.com/foo") { [202, {}, "bar"] }
+        faraday.get("http://user:password@test.com/foo")
 
         @stubs.verify_stubbed_calls
         @tracer.flush
@@ -74,10 +74,10 @@ module HubStep
         assert_equal "Faraday GET", span[:span_name]
         tags = [
           { Key: "component", Value: "faraday" },
-          { Key: "http.domain", Value: "" },
+          { Key: "http.domain", Value: "test.com" },
           { Key: "http.method", Value: "GET" },
           { Key: "http.status_code", Value: "202" },
-          { Key: "http.url", Value: "http:/foo" },
+          { Key: "http.url", Value: "http://user:password@test.com/foo" },
         ]
         assert_equal tags, span[:attributes].sort_by { |a| a[:Key] }
       end
