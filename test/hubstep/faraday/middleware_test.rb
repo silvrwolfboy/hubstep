@@ -30,6 +30,7 @@ module HubStep
         assert_equal "Faraday GET", span[:span_name]
         tags = [
           { Key: "component", Value: "faraday" },
+          { Key: "http.domain", Value: "" },
           { Key: "http.method", Value: "GET" },
           { Key: "http.status_code", Value: "202" },
           { Key: "http.url", Value: "http:/foo" },
@@ -52,6 +53,7 @@ module HubStep
           { Key: "error", Value: "true" },
           { Key: "error.class", Value: "Faraday::TimeoutError" },
           { Key: "error.message", Value: "request timed out" },
+          { Key: "http.domain", Value: "" },
           { Key: "http.method", Value: "GET" },
           { Key: "http.url", Value: "http:/foo" },
         ]

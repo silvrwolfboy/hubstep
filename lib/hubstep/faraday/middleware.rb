@@ -13,9 +13,10 @@ module HubStep
     #   b.adapter(:typhoeus)
     # end
     class Middleware < ::Faraday::Middleware
-      def initialize(app, tracer)
+      def initialize(app, tracer, options: nil)
         super(app)
         @tracer = tracer
+        @options = options || {}
       end
 
       def call(request_env)
@@ -39,12 +40,23 @@ module HubStep
 
       private
 
+      def record_url?
+        op = @options[:record_url]
+        return op unless op.nil?
+        true
+      end
+
       def record_request(span, request_env)
         method = request_env[:method].to_s.upcase
         span.operation_name = "Faraday #{method}"
         span.set_tag("component", "faraday")
-        span.set_tag("http.url", request_env[:url])
         span.set_tag("http.method", method)
+
+        url = request_env[:url]
+        span.set_tag("http.url", url) if record_url?
+
+        uri = URI.parse(url.to_s)
+        span.set_tag("http.domain", uri.host)
       end
 
       def record_response(span, response_env)
