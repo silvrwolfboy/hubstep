@@ -33,7 +33,6 @@ module HubStep
           { Key: "http.domain", Value: "" },
           { Key: "http.method", Value: "GET" },
           { Key: "http.status_code", Value: "202" },
-          { Key: "http.url", Value: "http:/foo" },
         ]
         assert_equal tags, span[:attributes].sort_by { |a| a[:Key] }
       end
@@ -55,6 +54,29 @@ module HubStep
           { Key: "error.message", Value: "request timed out" },
           { Key: "http.domain", Value: "" },
           { Key: "http.method", Value: "GET" },
+        ]
+        assert_equal tags, span[:attributes].sort_by { |a| a[:Key] }
+      end
+
+      def test_includes_url_tag_when_specified # rubocop:disable Metrics/MethodLength
+        faraday = ::Faraday.new do |b|
+          b.request(:hubstep, @tracer, include_urls: true)
+          b.adapter(:test, @stubs)
+        end
+
+        @stubs.get("/foo") { [202, {}, "bar"] }
+        faraday.get("/foo")
+
+        @stubs.verify_stubbed_calls
+        @tracer.flush
+
+        span = @reports.dig(0, :span_records, 0)
+        assert_equal "Faraday GET", span[:span_name]
+        tags = [
+          { Key: "component", Value: "faraday" },
+          { Key: "http.domain", Value: "" },
+          { Key: "http.method", Value: "GET" },
+          { Key: "http.status_code", Value: "202" },
           { Key: "http.url", Value: "http:/foo" },
         ]
         assert_equal tags, span[:attributes].sort_by { |a| a[:Key] }
