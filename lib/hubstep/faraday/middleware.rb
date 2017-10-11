@@ -13,9 +13,17 @@ module HubStep
     #   b.adapter(:typhoeus)
     # end
     class Middleware < ::Faraday::Middleware
-      def initialize(app, tracer)
+      # Create a Middleware
+      #
+      # tracer    - a HubStep::Tracer instance
+      # include_urls - Boolean specifying whether the `http.url` tag should be
+      #                added to the spans this middleware creates. URLs can
+      #                contain sensitive information, so they are omitted by
+      #                default.
+      def initialize(app, tracer, include_urls: false)
         super(app)
         @tracer = tracer
+        @include_urls = include_urls
       end
 
       def call(request_env)
@@ -43,8 +51,13 @@ module HubStep
         method = request_env[:method].to_s.upcase
         span.operation_name = "Faraday #{method}"
         span.set_tag("component", "faraday")
-        span.set_tag("http.url", request_env[:url])
         span.set_tag("http.method", method)
+
+        url = request_env[:url]
+        span.set_tag("http.url", url) if @include_urls
+
+        uri = URI.parse(url.to_s)
+        span.set_tag("http.domain", uri.host)
       end
 
       def record_response(span, response_env)
