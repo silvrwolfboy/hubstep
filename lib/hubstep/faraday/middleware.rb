@@ -13,9 +13,25 @@ module HubStep
     #   b.adapter(:typhoeus)
     # end
     class Middleware < ::Faraday::Middleware
-      def self.uri_parser(parser = nil)
-        @uri_parser ||= URI
+      class << self
+        # Set a URI parser.
+        #
+        # parser       - An object that responds to `parse`
+        #
+        def uri_parser=(parser)
+          if parser == :default
+            parser = URI
+          end
+          @uri_parser = parser
+        end
+
+        # Get the URI parser.
+        attr_reader :uri_parser
       end
+
+      # Default the uri_parser
+      self.uri_parser = :default
+
       # Create a Middleware
       #
       # tracer    - a HubStep::Tracer instance
