@@ -13,6 +13,25 @@ module HubStep
     #   b.adapter(:typhoeus)
     # end
     class Middleware < ::Faraday::Middleware
+      class << self
+        # Set a URI parser.
+        #
+        # parser       - An object that responds to `parse`
+        #
+        def uri_parser=(parser)
+          if parser == :default
+            parser = URI
+          end
+          @uri_parser = parser
+        end
+
+        # Get the URI parser.
+        attr_reader :uri_parser
+      end
+
+      # Default the uri_parser
+      self.uri_parser = :default
+
       # Create a Middleware
       #
       # tracer    - a HubStep::Tracer instance
@@ -56,8 +75,15 @@ module HubStep
         url = request_env[:url]
         span.set_tag("http.url", url) if @include_urls
 
-        uri = URI.parse(url.to_s)
-        span.set_tag("http.domain", uri.host)
+        begin
+          uri = self.class.uri_parser.parse(url.to_s)
+          domain = uri.host
+        rescue => e
+          HubStep.instrumenter.instrument("hubstep.faraday.middleware.error", error: e)
+          domain = nil
+        end
+
+        span.set_tag("http.domain", domain)
       end
 
       def record_response(span, response_env)

@@ -20,6 +20,17 @@ module HubStep
         end
       end
 
+      def test_can_configure_the_uri_parser
+        assert_equal URI, HubStep::Faraday::Middleware.uri_parser
+
+        HubStep::Faraday::Middleware.uri_parser = "test"
+
+        assert_equal "test", HubStep::Faraday::Middleware.uri_parser
+
+        # reset to the default
+        HubStep::Faraday::Middleware.uri_parser = :default
+      end
+
       def test_traces_requests
         @stubs.get("http://user:password@test.com/foo") { [202, {}, "bar"] }
         @faraday.get("http://user:password@test.com/foo")
