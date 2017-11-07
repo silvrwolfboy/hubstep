@@ -3,7 +3,7 @@
 require "English"
 require "net/http"
 
-unless LightStep::VERSION == '0.10.9'
+unless LightStep::VERSION == '0.11.2'
   raise <<-MSG
     This monkey patch needs to be reviewed for LightStep versions other than 0.10.9.
     To review, diff the changes between the `LightStep::Transport::HTTPJSON#report`
