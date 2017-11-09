@@ -12,7 +12,7 @@ class App
     @calls = 0
   end
 
-  def call(env)
+  def call(_)
     # Note we are not unlocking...
     @calls += 1
 
@@ -21,11 +21,10 @@ class App
   end
 end
 
-
 module HubStep
   class HTTPJSONTest < HubStep::TestCases
     def default_args
-      default_args = {
+      {
         host: "foo",
         port: 100,
         encryption: "bar",
@@ -33,8 +32,8 @@ module HubStep
       }
     end
 
-    def test_callback_successful_report # rubocop:disable Metrics/AbcSize
-      cb = mock()
+    def test_callback_successful_report
+      cb = mock
       cb.expects(:call).with do |report, result, duration_ms|
         assert_equal({}, report)
         assert_equal("200", result.code)
@@ -49,15 +48,15 @@ module HubStep
       transport.report({})
     end
 
-    def test_callback_when_an_error_when_reporting # rubocop:disable Metrics/AbcSize
+    def test_callback_when_an_error_when_reporting
       error = StandardError.new
       Net::HTTP.any_instance.expects(:request).raises(error)
 
-      cb = mock()
+      cb = mock
       cb.expects(:call).with do |report, result, duration_ms|
         assert_equal({}, report)
         assert_equal(error, result)
-        assert duration_ms > 0
+        assert duration_ms.positive?
       end
 
       transport = HubStep::Transport::HTTPJSON.new(default_args.merge(on_report_callback: cb))
@@ -72,8 +71,8 @@ module HubStep
       app = App.new
       stub_request(:post, "http://foo:100/api/v0/reports").to_rack(app)
 
-      cb = mock()
-      cb.expects(:call).twice.with do |report, result, duration_ms|
+      cb = mock
+      cb.expects(:call).twice.with do |report, _, _|
         assert report[:hello]
         assert !app.mutex.try_lock
       end

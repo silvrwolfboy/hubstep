@@ -19,9 +19,13 @@ Metrics/LineLength:
 
 Metrics/MethodLength:
   Max: 15
+  Exclude:
+    - "test/**/*"
 
 Metrics/AbcSize:
   Max: 17
+  Exclude:
+    - "test/**/*"
 
 Style/DoubleNegation:
   Enabled: false

@@ -132,7 +132,6 @@ module HubStep
       host = ENV["LIGHTSTEP_COLLECTOR_HOST"]
       port = ENV["LIGHTSTEP_COLLECTOR_PORT"]
       encryption = ENV["LIGHTSTEP_COLLECTOR_ENCRYPTION"]
-      verbosity = Integer(ENV.fetch("LIGHTSTEP_TRANSPORT_VERBOSITY", 0))
       access_token = ENV["LIGHTSTEP_ACCESS_TOKEN"]
 
       if host && port && encryption && access_token

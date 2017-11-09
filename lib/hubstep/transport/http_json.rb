@@ -55,15 +55,10 @@ module HubStep
         @https.use_ssl = encryption == ENCRYPTION_TLS
       end
 
-      def report(report) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+      def report(report)
         start = Time.now
 
-        req = Net::HTTP::Post.new('/api/v0/reports')
-        req['LightStep-Access-Token'] = @access_token
-        req['Content-Type'] = 'application/json'
-        req['Connection'] = 'keep-alive'
-
-        req.body = report.to_json
+        req = request report
 
         @mutex.synchronize do
           begin
@@ -71,11 +66,23 @@ module HubStep
           rescue => e
             res = e
           ensure
-            @on_report_callback.call(report, res, (Time.now - start) * 1_000) if !@on_report_callback.nil?
+            @on_report_callback&.call(report, res, (Time.now - start) * 1_000)
           end
         end
 
         nil
+      end
+
+      private
+
+      def request(report)
+        req = Net::HTTP::Post.new('/api/v0/reports')
+        req['LightStep-Access-Token'] = @access_token
+        req['Content-Type'] = 'application/json'
+        req['Connection'] = 'keep-alive'
+
+        req.body = report.to_json
+        req
       end
     end
   end

@@ -3,7 +3,6 @@
 require_relative "../test_helper"
 
 module HubStep
-  # rubocop:disable Metrics/AbcSize
   class TracerTest < HubStep::TestCases
     def test_starts_out_disabled
       refute_predicate HubStep::Tracer.new, :enabled?
@@ -70,7 +69,7 @@ module HubStep
       end
     end
 
-    def test_span_finishes_spans_unless_prohibited # rubocop:disable Metrics/MethodLength
+    def test_span_finishes_spans_unless_prohibited
       tracer = HubStep::Tracer.new
       tracer.enabled = true
 
