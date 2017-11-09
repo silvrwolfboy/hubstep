@@ -139,7 +139,6 @@ module HubStep
         HubStep::Transport::HTTPJSON.new(host: host,
                                          port: port.to_i,
                                          encryption: encryption,
-                                         verbose: verbosity,
                                          access_token: access_token)
       else
         LightStep::Transport::Nil.new

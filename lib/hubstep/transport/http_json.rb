@@ -5,47 +5,77 @@ require "net/http"
 
 unless LightStep::VERSION == '0.11.2'
   raise <<-MSG
-    This monkey patch needs to be reviewed for LightStep versions other than 0.10.9.
-    To review, diff the changes between the `LightStep::Transport::HTTPJSON#report`
-    method and the `HubStep::Transport::HTTPJSON#report` method below and port any
-    changes that seem necessary.
+    This custom transport needs to be reviewed for new LightStep versions.
+    To review, compare this implementation with `LightStep::Transport::HTTPJSON#report`
+    method and port any changes that seem necessary.
   MSG
 end
 
 module HubStep
   module Transport
-    # HTTPJSON is a transport that sends reports via HTTP in JSON format.
-    # It is thread-safe, however it is *not* fork-safe. When forking, all items
-    # in the queue will be copied and sent in duplicate.
+    # HTTPJSON is our customized transport which add some additional
+    # instrumentation and performance improvements.
     #
-    # When forking, you should first `disable` the tracer, then `enable` it from
-    # within the fork (and in the parent post-fork). See
-    # `examples/fork_children/main.rb` for an example.
-    class HTTPJSON < LightStep::Transport::HTTPJSON
-      # Queue a report for sending
+    # Callback Notes: To provide some observability into this transport's
+    # operation, we allow a callback `on_report_callback` to be provided. This
+    # callback will be called with the signature (report, result, duration_ms)
+    # where result can be either the http response or an exception. This
+    # callback will be delivered while maintaining this transports mutex which
+    # should provide some measure of thread-safety for the caller.
+    class HTTPJSON < LightStep::Transport::Base
+      ENCRYPTION_TLS = 'tls'
+      ENCRYPTION_NONE = 'none'
+
+      # Initialize the transport
+      # @param host [String] host of the domain to the endpoind to push data
+      # @param port [Numeric] port on which to connect
+      # @param verbose [Numeric] verbosity level. Right now 0-3 are supported
+      # @param encryption [ENCRYPTION_TLS, ENCRYPTION_NONE] kind of encryption to use
+      # @param access_token [String] access token for LightStep server
+      # @param on_report_callback [method] Called after reporting has completed
+      # @return [HTTPJSON]
+      def initialize(host:, port:, encryption: ENCRYPTION_TLS, access_token:, on_report_callback: nil)
+        @on_report_callback = on_report_callback
+
+        raise Tracer::ConfigurationError, "host must be specified" if host.nil? || host.empty?
+        raise Tracer::ConfigurationError, "port must be specified" if port.nil?
+        raise Tracer::ConfigurationError, "access_token must be a string" unless String === access_token
+        raise Tracer::ConfigurationError, "access_token cannot be blank"  if access_token.empty?
+
+        @access_token = access_token
+
+        # This mutex protects the use of our Net::HTTP instance which we
+        # maintain as a long lived connection. While a Lightstep::Transport is
+        # typically called only from within the reporting thread, there are
+        # some situations where this can be bypassed (directly calling `flush`
+        # for example)
+        @mutex = Mutex.new
+
+        @https = Net::HTTP.new(host, port)
+        @https.use_ssl = encryption == ENCRYPTION_TLS
+      end
+
       def report(report) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
-        p report if @verbose >= 3
+        start = Time.now
 
-        HubStep.instrumenter.instrument('lightstep.transport.report', {}) do |payload|
-          https = Net::HTTP.new(@host, @port)
-          https.use_ssl = @encryption == ENCRYPTION_TLS
-          req = Net::HTTP::Post.new('/api/v0/reports')
-          req['LightStep-Access-Token'] = @access_token
-          req['Content-Type'] = 'application/json'
-          req['Connection'] = 'keep-alive'
-          req.body = report.to_json
-          res = https.request(req)
+        req = Net::HTTP::Post.new('/api/v0/reports')
+        req['LightStep-Access-Token'] = @access_token
+        req['Content-Type'] = 'application/json'
+        req['Connection'] = 'keep-alive'
 
-          payload[:request_body] = req.body
+        req.body = report.to_json
 
-          puts res.to_s, res.body if @verbose >= 3
-
-          payload[:response] = res
+        @mutex.synchronize do
+          begin
+            res = @https.request(req)
+          rescue => e
+            res = e
+          ensure
+            @on_report_callback.call(report, res, (Time.now - start) * 1_000) if !@on_report_callback.nil?
+          end
         end
 
         nil
-      rescue => e
-        HubStep.instrumenter.instrument('lightstep.transport.error', error: e)
       end
     end
   end
