@@ -34,10 +34,10 @@ module HubStep
 
     def test_callback_successful_report
       cb = mock
-      cb.expects(:call).with do |report, result, duration_ms|
+      cb.expects(:call).with do |report, result, start|
         assert_equal({}, report)
         assert_equal("200", result.code)
-        assert duration_ms > 0.0
+        assert start < Time.now
       end
 
       transport = HubStep::Transport::HTTPJSON.new(default_args.merge(on_report_callback: cb))
@@ -53,10 +53,10 @@ module HubStep
       Net::HTTP.any_instance.expects(:request).raises(error)
 
       cb = mock
-      cb.expects(:call).with do |report, result, duration_ms|
+      cb.expects(:call).with do |report, result, start|
         assert_equal({}, report)
         assert_equal(error, result)
-        assert duration_ms.positive?
+        assert start < Time.now
       end
 
       transport = HubStep::Transport::HTTPJSON.new(default_args.merge(on_report_callback: cb))

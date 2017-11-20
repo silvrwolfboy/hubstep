@@ -66,7 +66,7 @@ module HubStep
           rescue => e
             res = e
           ensure
-            @on_report_callback&.call(report, res, (Time.now - start) * 1_000)
+            @on_report_callback&.call(report, res, start)
           end
         end
 
