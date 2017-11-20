@@ -29,7 +29,6 @@ module HubStep
       # Initialize the transport
       # @param host [String] host of the domain to the endpoind to push data
       # @param port [Numeric] port on which to connect
-      # @param verbose [Numeric] verbosity level. Right now 0-3 are supported
       # @param encryption [ENCRYPTION_TLS, ENCRYPTION_NONE] kind of encryption to use
       # @param access_token [String] access token for LightStep server
       # @param on_report_callback [method] Called after reporting has completed
