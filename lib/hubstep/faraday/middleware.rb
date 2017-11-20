@@ -78,7 +78,7 @@ module HubStep
         begin
           uri = self.class.uri_parser.parse(url.to_s)
           domain = uri.host
-        rescue => e
+        rescue
           domain = nil
         end
 
