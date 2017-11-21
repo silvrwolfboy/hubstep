@@ -5,6 +5,9 @@ AllCops:
   Exclude:
     - "bin/**/*"
     - "vendor/**/*"
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - "test/**/*"
 
 Metrics/BlockLength:
   Exclude:

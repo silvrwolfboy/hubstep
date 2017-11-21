@@ -151,7 +151,7 @@ module HubStep
           calls << "configure"
         end
       end
-      assert_equal %w(span), calls
+      assert_equal %w[span], calls
     end
 
     def test_configure_block_called_when_enabled
@@ -164,7 +164,7 @@ module HubStep
           calls << "configure"
         end
       end
-      assert_equal %w(span configure), calls
+      assert_equal %w[span configure], calls
     end
 
     def test_can_pass_custom_transport
