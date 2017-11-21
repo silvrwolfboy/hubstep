@@ -10,7 +10,7 @@ module HubStep
       Failbot.backend = Failbot::MemoryBackend.new
     end
 
-    def test_reports_http_client_errors_to_failbot # rubocop:disable Metrics/AbcSize
+    def test_reports_http_client_errors_to_failbot
       stub_request(:post, "http://example.com:9876/api/v0/reports").to_return(status: 400)
 
       tracer = new_tracer
@@ -29,7 +29,7 @@ module HubStep
                    report["class"]
     end
 
-    def test_reports_http_server_errors_to_failbot # rubocop:disable Metrics/AbcSize
+    def test_reports_http_server_errors_to_failbot
       stub_request(:post, "http://example.com:9876/api/v0/reports").to_return(status: 500)
 
       tracer = new_tracer
@@ -48,7 +48,7 @@ module HubStep
                    report["class"]
     end
 
-    def test_reports_exceptions_to_failbot # rubocop:disable Metrics/AbcSize
+    def test_reports_exceptions_to_failbot
       stub_request(:post, "http://example.com:9876/api/v0/reports")
         .to_raise(Errno::ECONNREFUSED.new)
 
