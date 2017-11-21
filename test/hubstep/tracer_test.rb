@@ -3,7 +3,6 @@
 require_relative "../test_helper"
 
 module HubStep
-  # rubocop:disable Metrics/AbcSize
   class TracerTest < HubStep::TestCases
     def test_starts_out_disabled
       refute_predicate HubStep::Tracer.new, :enabled?
@@ -70,7 +69,7 @@ module HubStep
       end
     end
 
-    def test_span_finishes_spans_unless_prohibited # rubocop:disable Metrics/MethodLength
+    def test_span_finishes_spans_unless_prohibited
       tracer = HubStep::Tracer.new
       tracer.enabled = true
 
@@ -202,23 +201,6 @@ module HubStep
       ]
 
       assert_equal expected, custom_attrs.sort_by { |a| a[:Key] }
-    end
-
-    def test_verbosity_false
-      tracer = HubStep::Tracer.new(verbose: false)
-      tracer.enabled = true
-
-      # default level emits (we get a real span)
-      tracer.span("foo") do |foo|
-        assert_instance_of LightStep::Span, foo
-        assert_equal foo, tracer.bottom_span
-      end
-
-      # verbose true does not emit
-      tracer.span("baz", verbose: true) do |baz|
-        assert_equal HubStep::Tracer::InertSpan.instance, baz
-        assert_equal baz, tracer.bottom_span
-      end
     end
   end
 end

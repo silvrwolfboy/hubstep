@@ -48,7 +48,7 @@ module HubStep
         assert_equal tags, span[:attributes].sort_by { |a| a[:Key] }
       end
 
-      def test_traces_requests_that_raise # rubocop:disable Metrics/MethodLength
+      def test_traces_requests_that_raise
         @stubs.get("http://user:password@test.com/foo") do
           raise ::Faraday::Error::TimeoutError, "request timed out"
         end
@@ -72,7 +72,7 @@ module HubStep
         assert_equal tags, span[:attributes].sort_by { |a| a[:Key] }
       end
 
-      def test_includes_url_tag_when_specified # rubocop:disable Metrics/MethodLength
+      def test_includes_url_tag_when_specified
         faraday = ::Faraday.new do |b|
           b.request(:hubstep, @tracer, include_urls: true)
           b.adapter(:test, @stubs)

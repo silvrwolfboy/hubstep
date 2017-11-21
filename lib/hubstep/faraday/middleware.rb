@@ -78,8 +78,7 @@ module HubStep
         begin
           uri = self.class.uri_parser.parse(url.to_s)
           domain = uri.host
-        rescue => e
-          HubStep.instrumenter.instrument("hubstep.faraday.middleware.error", error: e)
+        rescue
           domain = nil
         end
 

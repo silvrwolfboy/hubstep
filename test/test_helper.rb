@@ -14,9 +14,5 @@ Failbot.setup(ENV, app: "hubstep-test")
 
 module HubStep
   class TestCases < Minitest::Test
-    def after_teardown
-      super
-      HubStep.instrumenter = nil
-    end
   end
 end
