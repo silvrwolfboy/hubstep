@@ -49,7 +49,7 @@ module HubStep
       end
 
       def test_adds_error_tag_for_error_status_codes
-        @stubs.get("http://user:password@test.com/foo") { [404, {}, "bar"] }
+        @stubs.get("http://user:password@test.com/foo") { [500, {}, "bar"] }
         @faraday.get("http://user:password@test.com/foo")
         @stubs.verify_stubbed_calls
         @tracer.flush

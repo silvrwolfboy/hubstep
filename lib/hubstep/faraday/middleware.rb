@@ -89,7 +89,7 @@ module HubStep
         status = response_env[:status]
         span.set_tag("http.status_code", status)
 
-        return if status.to_i < 400
+        return if status.to_i < 500
         span.set_tag("error", true)
       end
 

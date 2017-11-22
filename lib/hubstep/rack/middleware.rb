@@ -67,7 +67,7 @@ module HubStep
 
       def record_response(span, status, _headers, _body)
         span.set_tag("http.status_code", status)
-        return if status.to_i < 400
+        return if status.to_i < 500
         span.set_tag("error", true)
       end
 
