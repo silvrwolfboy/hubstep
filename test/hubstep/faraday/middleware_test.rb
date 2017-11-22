@@ -55,7 +55,7 @@ module HubStep
         @tracer.flush
 
         span = @reports.dig(0, :span_records, 0)
-        assert_includes(span[:attributes], { Key: "error", Value: "true" })
+        assert_includes(span[:attributes], Key: "error", Value: "true")
       end
 
       def test_traces_requests_that_raise

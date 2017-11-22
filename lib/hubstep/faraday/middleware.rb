@@ -89,9 +89,8 @@ module HubStep
         status = response_env[:status]
         span.set_tag("http.status_code", status)
 
-        if status.to_i >= 400
-          span.set_tag("error", true)
-        end
+        return if status.to_i < 400
+        span.set_tag("error", true)
       end
 
       def record_exception(span, exception)
