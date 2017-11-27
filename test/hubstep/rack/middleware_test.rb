@@ -108,9 +108,17 @@ module HubStep
         @status_code = 200
         get "/foo"
         assert_equal "200", span.tags["http.status_code"]
+        refute span.tags["error"]
+
         @status_code = 404
         get "/foo"
         assert_equal "404", span.tags["http.status_code"]
+        refute span.tags["error"]
+
+        @status_code = 500
+        get "/foo"
+        assert_equal "500", span.tags["http.status_code"]
+        assert span.tags["error"]
       end
 
       def test_wraps_request_in_span

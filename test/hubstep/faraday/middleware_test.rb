@@ -48,6 +48,16 @@ module HubStep
         assert_equal tags, span[:attributes].sort_by { |a| a[:Key] }
       end
 
+      def test_adds_error_tag_for_error_status_codes
+        @stubs.get("http://user:password@test.com/foo") { [500, {}, "bar"] }
+        @faraday.get("http://user:password@test.com/foo")
+        @stubs.verify_stubbed_calls
+        @tracer.flush
+
+        span = @reports.dig(0, :span_records, 0)
+        assert_includes(span[:attributes], Key: "error", Value: "true")
+      end
+
       def test_traces_requests_that_raise
         @stubs.get("http://user:password@test.com/foo") do
           raise ::Faraday::Error::TimeoutError, "request timed out"
