@@ -65,6 +65,11 @@ module HubStep
         req = request report
 
         @mutex.synchronize do
+          # Typically, keep-alive for Net:HTTP is handled inside a start block,
+          # but that's awkward with our threading model. By starting it manually,
+          # once, the TCP connection should remain open for multiple report calls.
+          @http.start unless @http.started?
+
           begin
             res = @http.request(req)
           rescue => e
