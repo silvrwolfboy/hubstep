@@ -26,6 +26,10 @@ module HubStep
       ENCRYPTION_TLS = 'tls'
       ENCRYPTION_NONE = 'none'
 
+      # Provide access to the underlying Net::HTTP object so we can do fun
+      # stuff like verify keep-alive is working.
+      attr_reader :http
+
       # Initialize the transport
       # @param host [String] host of the domain to the endpoind to push data
       # @param port [Numeric] port on which to connect
@@ -50,8 +54,9 @@ module HubStep
         # for example)
         @mutex = Mutex.new
 
-        @https = Net::HTTP.new(host, port)
-        @https.use_ssl = encryption == ENCRYPTION_TLS
+        @http = Net::HTTP.new(host, port)
+        @http.use_ssl = encryption == ENCRYPTION_TLS
+        @http.keep_alive_timeout = 5
       end
 
       def report(report)
@@ -61,7 +66,7 @@ module HubStep
 
         @mutex.synchronize do
           begin
-            res = @https.request(req)
+            res = @http.request(req)
           rescue => e
             res = e
           ensure
