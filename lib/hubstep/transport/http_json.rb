@@ -50,8 +50,9 @@ module HubStep
         # for example)
         @mutex = Mutex.new
 
-        @https = Net::HTTP.new(host, port)
-        @https.use_ssl = encryption == ENCRYPTION_TLS
+        @http = Net::HTTP.new(host, port)
+        @http.use_ssl = encryption == ENCRYPTION_TLS
+        @http.keep_alive_timeout = 5
       end
 
       def report(report)
@@ -60,8 +61,13 @@ module HubStep
         req = request report
 
         @mutex.synchronize do
+          # Typically, keep-alive for Net:HTTP is handled inside a start block,
+          # but that's awkward with our threading model. By starting it manually,
+          # once, the TCP connection should remain open for multiple report calls.
+          @http.start unless @http.started?
+
           begin
-            res = @https.request(req)
+            res = @http.request(req)
           rescue => e
             res = e
           ensure
