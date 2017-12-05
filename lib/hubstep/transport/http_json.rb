@@ -26,10 +26,6 @@ module HubStep
       ENCRYPTION_TLS = 'tls'
       ENCRYPTION_NONE = 'none'
 
-      # Provide access to the underlying Net::HTTP object so we can do fun
-      # stuff like verify keep-alive is working.
-      attr_reader :http
-
       # Initialize the transport
       # @param host [String] host of the domain to the endpoind to push data
       # @param port [Numeric] port on which to connect
