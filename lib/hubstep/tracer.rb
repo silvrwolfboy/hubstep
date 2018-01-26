@@ -126,6 +126,32 @@ module HubStep
       @tracer.flush if enabled?
     end
 
+    # Inject a SpanContext into the given carrier
+    #
+    # span_context - A SpanContext
+    # format       - A LightStep::Tracer format
+    # carrier      - A Hash
+    #
+    # Example:
+    #
+    #   tracer.span("request") do |span|
+    #     carrier = {}
+    #     tracer.inject(
+    #       span.span_context,
+    #       LightStep::Tracer::FORMAT_TEXT_MAP,
+    #       carrier
+    #     )
+    #
+    #     client.request(data, headers: carrier)
+    #   end
+    #
+    # Returns nil but mutates the carrier.
+    def inject(span_context, format, carrier)
+      return carrier unless enabled?
+
+      @tracer.inject(span_context, format, carrier)
+    end
+
     private
 
     def default_transport
@@ -177,12 +203,25 @@ module HubStep
         nil
       end
 
+      def span_context
+        InertSpanContext.instance
+      end
+
       def log(event: nil, timestamp: nil, **fields) # rubocop:disable Lint/UnusedMethodArgument
         nil
       end
 
       def finish(end_time: nil)
       end
+    end
+
+    # Mimics the interface and no-op behavior of LightStep::SpanContaxt. This
+    # is used when tracing is disabled.
+    class InertSpanContext
+      include Singleton
+      instance.freeze
+
+      attr_reader :id, :trace_id, :baggage
     end
   end
 end
