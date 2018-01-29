@@ -147,7 +147,7 @@ module HubStep
     #
     # Returns nil but mutates the carrier.
     def inject(span_context, format, carrier)
-      return carrier unless enabled?
+      return unless enabled?
 
       @tracer.inject(span_context, format, carrier)
     end
