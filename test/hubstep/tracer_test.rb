@@ -202,5 +202,27 @@ module HubStep
 
       assert_equal expected, custom_attrs.sort_by { |a| a[:Key] }
     end
+
+    def test_injects_span_context_into_a_carrier_when_enabled
+      tracer = HubStep::Tracer.new
+      carrier = {}
+
+      tracer.with_enabled(false) do
+        tracer.span("foo") do |span|
+          tracer.inject(span.span_context, LightStep::Tracer::FORMAT_TEXT_MAP, carrier)
+        end
+      end
+
+      assert_equal({}, carrier)
+
+      tracer.with_enabled(true) do
+        tracer.span("foo") do |span|
+          tracer.inject(span.span_context, LightStep::Tracer::FORMAT_TEXT_MAP, carrier)
+        end
+      end
+
+      assert carrier[LightStep::Tracer::CARRIER_SPAN_ID] =~ /\w+/
+      assert carrier[LightStep::Tracer::CARRIER_TRACE_ID] =~ /\w+/
+    end
   end
 end
