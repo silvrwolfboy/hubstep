@@ -215,7 +215,7 @@ module HubStep
       end
     end
 
-    # Mimics the interface and no-op behavior of LightStep::SpanContaxt. This
+    # Mimics the interface and no-op behavior of LightStep::SpanContext. This
     # is used when tracing is disabled.
     class InertSpanContext
       include Singleton
