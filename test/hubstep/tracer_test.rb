@@ -241,7 +241,7 @@ module HubStep
       tracer = HubStep::Tracer.new
       carrier = {
         "ot-tracer-traceid" => "trace-1",
-        "ot-tracer-spanid" => "span-1"
+        "ot-tracer-spanid" => "span-1",
       }
 
       tracer.with_enabled(false) do
