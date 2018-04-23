@@ -120,6 +120,18 @@ module HubStep
       end
     end
 
+    def test_tracks_injected_parent_relationship
+      tracer = HubStep::Tracer.new
+      tracer.enabled = true
+
+      parent_context = LightStep::SpanContext.new(id: "span-1", trace_id: "trace-1")
+
+      tracer.span("a", child_of: parent_context) do |a|
+        assert_equal "trace-1", a.span_context.trace_id
+        assert_equal "span-1", a.tags[:parent_span_guid]
+      end
+    end
+
     class CustomError < StandardError; end
 
     def test_records_exceptions
@@ -223,6 +235,24 @@ module HubStep
 
       assert carrier[LightStep::Tracer::CARRIER_SPAN_ID] =~ /\w+/
       assert carrier[LightStep::Tracer::CARRIER_TRACE_ID] =~ /\w+/
+    end
+
+    def test_extracts_span_context_from_a_carrier_when_enabled
+      tracer = HubStep::Tracer.new
+      carrier = {
+        "ot-tracer-traceid" => "trace-1",
+        "ot-tracer-spanid" => "span-1"
+      }
+
+      tracer.with_enabled(false) do
+        assert_nil tracer.extract(LightStep::Tracer::FORMAT_TEXT_MAP, carrier)
+      end
+
+      tracer.with_enabled(true) do
+        context = tracer.extract(LightStep::Tracer::FORMAT_TEXT_MAP, carrier)
+        assert_equal "trace-1", context.trace_id
+        assert_equal "span-1", context.id
+      end
     end
   end
 end

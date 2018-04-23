@@ -71,6 +71,8 @@ module HubStep
     # operation_name - short human-readable String identifying the work done by the span
     # start_time     - Time instance representing when the span began
     # tags           - Hash of String => String tags to add to the span
+    # child_of       - The Span or SpanContext of the parent span or nil to use the last span.
+    #                  If no span is provided or found, a new root span will be started.
     # finish         - Boolean indicating whether to "finish" (i.e., record the
     #                  span's end time and submit it to the collector).
     #                  Defaults to true.
@@ -80,13 +82,13 @@ module HubStep
     #
     # Yields a LightStep::Span or InertSpan to the block. Returns the block's
     # return value.
-    def span(operation_name, start_time: nil, tags: nil, finish: true, verbose: false)
+    def span(operation_name, start_time: nil, tags: nil, child_of: nil, finish: true, verbose: false)
       unless enabled? && should_emit?(verbose)
         return yield InertSpan.instance
       end
 
       span = @tracer.start_span(operation_name,
-                                child_of: @spans.last,
+                                child_of: child_of || @spans.last,
                                 start_time: start_time,
                                 tags: tags)
       @spans << span
@@ -150,6 +152,24 @@ module HubStep
       return unless enabled?
 
       @tracer.inject(span_context, format, carrier)
+    end
+
+    # Extract a SpanContext from the given carrier.
+    #
+    # format  - A LightStep::Tracer format
+    # carrier - A Hash which might include context.
+    #
+    # Example:
+    #
+    #   context = tracer.extract(OpenTracing::FORMAT_TEXT_MAP, carrier)
+    #   tracer.span("my-operation", child_of: context) { ... }
+    #
+    # Returns a SpanContext for use as a parent span, or nil if no context could
+    # be extracted.
+    def extract(format, carrier)
+      return unless enabled?
+
+      @tracer.extract(format, carrier)
     end
 
     private
