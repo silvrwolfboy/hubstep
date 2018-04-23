@@ -88,7 +88,7 @@ module HubStep
       end
 
       span = @tracer.start_span(operation_name,
-                                child_of: child_of || @spans.last,
+                                child_of: parent_span(child_of),
                                 start_time: start_time,
                                 tags: tags)
       @spans << span
@@ -197,6 +197,10 @@ module HubStep
       else
         @spans.delete(span)
       end
+    end
+
+    def parent_span(child_of)
+      child_of || @spans.last
     end
 
     # Mimics the interface and no-op behavior of OpenTracing::Span. This is
